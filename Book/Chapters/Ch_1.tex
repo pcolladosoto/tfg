@@ -1,0 +1,15 @@
+\chapter{Introductory Theory}
+    \section{Project's Background}
+        Our work cannot be understood if we don't take into account our tutor's research group's current line of research. That is no other than \textbf{network resilience} and how we can improve it. Their approach is broadly based on modeling a network infrastructure as a multilayered construct where the upper layers get closer and closer to reality as we continue climbing them down. We can see how this approach is quite similar to that of conceptual network stacks such as the ones running today's Internet.\\
+
+        The above line of work has produced some high-quality papers worth of theory. We mustn't forget that we are engineers nonetheless, which means we ought to look for a real-world application for our solutions. In an effort to somehow experimentally measure the effectiveness of the defense strategies proposed by the group's research we have been tasked with the development of a testing \textit{framework}. Said \textit{framework} needs to somehow \textit{emulate} an arbitrary network topology on which we can operate in such a way that we can mimic real world attacks. By applying the researched mitigation strategies on said scenario we plan on being able to settle which do best based on the current threat and network topology.\\
+
+        \subsection{Emulation vs Simulation}
+            These two terms are often used interchangeably when referring to tools whose mission is providing the user with a scenario resembling the real world in some sort of way. Even though both terms share the same purpose the way in which the accomplish it is radically different.\\
+
+            \textbf{Simulation} leverages the theory capable of modeling real world phenomena. The clearest example may be physics. Physics let us model the world that surrounds us through math. That is why we can leverage the pertaining equations to compute the outcome of any scenario we can describe. Thus, Simulation \textbf{computes} an outcome based on the initial parameters and the model we have built for describing the system under study. This implies that simulation is limited by how good our models are. If an equation doesn't take an aspect into account that means it won't affect the simulation's outcome which in turn can result in inaccurate results. Techniques used for simulating systems include discrete event and agent based simulations such as those used by the well known \texttt{Any Logic}.\\
+
+            \textbf{Emulation}, on the other hand, tries to recreate the system under study to then perform experiments on it. If we manage to craft a detailed enough model, we could even get a glimpse of unexpected behaviors we hadn't taken into account. This is why emulation is often the preferred approach. Nonetheless, it is harder to recreate a system than it is to describe its expected behavior. In our project we have nonetheless decided to go with emulation so that we reaped the most useful information from our experiments.\\
+
+    \section{Defining the Requirements}
+        Build up to the net stack!
