@@ -1,110 +1,58 @@
-\documentclass[12 pt]{book}
-
-% Vertical bars
-\usepackage{amsmath}
-
-% Handle characters beyond ASCII nicely
-\usepackage[utf8]{inputenc}
-
-% Make the References section show up in the table of contents
-\usepackage[nottoc, numbib]{tocbibind}
-
-% Let us cite the bibliography entries
-\usepackage{cite}
-
-% Time to add images
-\usepackage{graphicx}
-\graphicspath{{Img/}}
-
-% Links please!
-\usepackage{hyperref}
-
-% Format the links
-\hypersetup{
-    pdfborder = {0 0 0},    % Remove the ugly border
-    colorlinks = true,      % Let there be color
-    citecolor = black,      % Make citations appear normal (i.e black)
-    linkcolor = black,      % The same for links (i.e table of contents)
-    urlcolor = cyan         % Color the web links. (cyan is fancy for blueish...)
-}
-
-% Modify the margins
-% \usepackage{geometry}
-% \geometry{
-%     a4paper,
-%     left = 18mm,
-%     right = 18mm,
-%     top = 14mm,
-% }
-
-% Enable fixed-width centered columns
-% \usepackage{array}
-% \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
-
-% Insert space between paragraphs
-\newcommand{\newpar} {
-    \vskip 0.5cm
-}
-
-% Remove the title page's number
-\usepackage{titling}
-
-\title{Think about something witty}
-\author{Pablo \\ \\ \textbf{\texttt{TFG}} \\ \\ \textbf{Universidad de Alcalá}}
-\date{}
+\input{Preamble/Preamble.tex}
 
 \begin{document}
-    %%%%%%%%%%%
-    %% COVER %%
-    %%%%%%%%%%%
+    %
+        %%%%%%%%%%%
+        %% COVER %%
+        %%%%%%%%%%%
 
-    % TODO: Fix me up!
+        % TODO: Fix me up!
 
-    % \begin{titlingpage}
-    %     \maketitle
-    %     \begin{figure}[!htb]
-    %         \centering
-    %         \includegraphics[width=0.6\linewidth]{cover_pic.jpg}
-    %     \end{figure}
-    % \end{titlingpage}
+        % \begin{titlingpage}
+        %     \maketitle
+        %     \begin{figure}[!htb]
+        %         \centering
+        %         \includegraphics[width=0.6\linewidth]{cover_pic.jpg}
+        %     \end{figure}
+        % \end{titlingpage}
 
-    %%%%%%%%%%
-    %% ACKs %%
-    %%%%%%%%%%
+        %%%%%%%%%%
+        %% ACKs %%
+        %%%%%%%%%%
 
-    % TODO!
+        % TODO!
 
-    %%%%%%%%%%%%%%%%%%%%%%%
-    %% TABLE OF CONTENTS %%
-    %%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%%%%%%
+        %% TABLE OF CONTENTS %%
+        %%%%%%%%%%%%%%%%%%%%%%%
 
-    % \newpage
-    % \tableofcontents
-    % \newpage
+        % \newpage
+        % \tableofcontents
+        % \newpage
 
-    %%%%%%%%%%%%%%%%%%%%%
-    %% LIST OF FIGURES %%
-    %%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%%%%
+        %% LIST OF FIGURES %%
+        %%%%%%%%%%%%%%%%%%%%%
 
-    % TODO!
+        % TODO!
 
-    %%%%%%%%%%%%%%%%%%%%
-    %% LIST OF TABLES %%
-    %%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%%%
+        %% LIST OF TABLES %%
+        %%%%%%%%%%%%%%%%%%%%
 
-    % TODO!
+        % TODO!
 
-    %%%%%%%%%%%%%%
-    %% ABSTRACT %%
-    %%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%
+        %% ABSTRACT %%
+        %%%%%%%%%%%%%%
 
-    % TODO!
+        % TODO!
 
-    %%%%%%%%%%%%%%%%%%%%%%%
-    %% EXTENDED ABSTRACT %%
-    %%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%%%%%%
+        %% EXTENDED ABSTRACT %%
+        %%%%%%%%%%%%%%%%%%%%%%%
 
-    % TODO!
+        % TODO!
 
     %%%%%%%%%%%%%%%
     %% CHAPTER 1 %%
@@ -115,5 +63,11 @@
     % for info on them!
 
     \input{Chapters/Ch_1.tex}
+
+    %%%%%%%%%%%%%%%
+    %% CHAPTER 2 %%
+    %%%%%%%%%%%%%%%
+
+    \input{Chapters/Ch_2.tex}
 
 \end{document}
