@@ -4,3 +4,6 @@
 
 # Get rid of MacOS's trash files
 .DS_Store
+
+# Get rid of workspace configs for Code
+.vscode
