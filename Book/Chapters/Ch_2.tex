@@ -19,9 +19,21 @@
 
         Given the previous discussion we can now clearly see the base on which everything else is built upon. The ability to have several coexisting network stacks on a machine and being able to connect them as we please is such a powerful tool that our work is only scratching the surface of the capabilities enabled by this kind of technology. Linux's network stacks are nothing short of an ode to code modularity if you ask us.\\
 
-        All the previous discussion is related with the theoretical or conceptual realm of matters. We will now delve into how we can translate these ideas into a working virtual network. After going through that process we'll also look into how we decided to do everything manually once we have a broader technical background on the subject.
+        All the previous discussion is related with the theoretical or conceptual realm of matters. We will now delve into how we can translate these ideas into a working virtual network. After going through that process we'll also look into how we decided to do everything manually once we have a broader technical background on the subject.\\
 
         Finally, we feel we need to clarify that, even though it may be clear at this point, all the network traffic we are to generate originates from within our own system. In other words, our network would be perfectly capable of working without any Internet access.\\
 
     \section{The Network Namespace}
         % \pyfile{Code_snippets/foo.py}
+
+        % Just as we have previously discussed, design and implementation are two very different things. A prime example is the case of the \texttt{SNMP} tools where \texttt{SNMP} stands for \texttt{Simple Network Management Protocol}. This protocol was originally defined in \href{https://tools.ietf.org/html/rfc1067}{RFC 1067} but no implementation was defined. With time, the \texttt{net-snmp} suite of tools became the de-facto implementation for \texttt{SNMP}. It is then of the utmost importance to notice that the design and implementation needn't be carried out by the same people; in fact, it's not uncommon to have several implementations for a given design. That's the case with shells of which we have so many, \texttt{bash}, \texttt{zsh}, \texttt{ksh} and so on. Then, we can expect the Linux...\\
+
+        Many of the programming languages dominating today's market are object oriented. This, very roughly, means that the programmer is expected to generate \textit{classes} representing "real-life" entities to some extent. These classes are defined by their \textit{attributes} (characteristics) and their \textit{methods} (what they can do). Now, a class by itself cannot do anything, we need to \textit{instantiate} it so that we create an \textit{object} of that class. We'll then be capable of using the newly created object as we please.\\
+
+        This concept on instantiation is actually quite powerful as it appears continuously in many areas of engineering. Now, we could say that Linux's network namespaces work in a similar fashion to classes. We can think of the network stack as the class and what we call \textit{network namespaces} as the objects. Let's delve a bit deeper into what these namespaces really are.\\
+
+        As seen \href{https://en.wikipedia.org/wiki/Linux_namespaces}{here}, namespaces are not only seen when doing networking stuff, they are a feature of the Linux kernel employed in many other areas. These namespaces let us partition kernel resources so that each process sees a resource that's only for it, it's not shared. When applied to networking we can see how each network namespace represents an entire network stack. Then, if we set up several network namespaces (namespaces from now on as this is the only type of namespace we will deal with) we have effectively housed several network stacks under the same roof. If there was any way of interconnecting these namespaces we would have taken quite a dent off our task.\\
+
+        We will now take a look at the virtual wires we have fought so many times against, the so called \texttt{veths}.\\
+
+    \section{Wire time}
