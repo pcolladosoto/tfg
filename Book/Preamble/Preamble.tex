@@ -28,6 +28,23 @@
     urlcolor = cyan         % Color the web links. (cyan is fancy for blueish...)
 }
 
+% Use minted for code highlighting. Minted doc -> http://mirror.ox.ac.uk/sites/ctan.org/macros/latex/contrib/minted/minted.pdf
+\usepackage{minted}
+
+% Define new environments with settings and all. Use it with \begin{pycode}\end{pycode}
+\newminted{py}{
+    frame = lines,
+    style = emacs,
+    linenos
+}
+
+% Style input files. Use it with \pyfile{path/from/Book/directory/foo.py}
+\newmintedfile{py}{
+    frame = lines,
+    style = emacs,
+    linenos
+}
+
 % Modify the margins
 % \usepackage{geometry}
 % \geometry{

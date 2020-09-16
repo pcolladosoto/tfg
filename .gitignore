@@ -7,3 +7,6 @@
 
 # Get rid of workspace configs for Code
 .vscode
+
+# Get rid of minted's trash
+_minted-main

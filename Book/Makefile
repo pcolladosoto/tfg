@@ -5,14 +5,17 @@ CHAPTERS = $(addprefix Chapters/Ch_, 1 ) # pipes dispatcher worker gatherer fifo
 # Trashy file formats
 TRASH = *.aux *.ist *.log *.out *.sbl *.acn
 
+# LaTeX compiler flags
+FLAGS = -shell-escape
+
 all: main clean
 
 dbg: main
 
 # We need to run it twice for the refs and stuff to be picked up!
 main: main.tex
-	pdflatex -jobname $@ $<
-	pdflatex -jobname $@ $<
+	pdflatex $(FLAGS) -jobname $@ $<
+	pdflatex $(FLAGS) -jobname $@ $<
 
 .PHONY: clean clean_pdf
 
