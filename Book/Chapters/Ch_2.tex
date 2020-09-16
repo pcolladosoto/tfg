@@ -37,3 +37,13 @@
         We will now take a look at the virtual wires we have fought so many times against, the so called \texttt{veths}.\\
 
     \section{Wire time}
+        In a previous section we already provided some comments on what NICs are. Knowing that interfaces create "bridges" between different systems we can clearly see how these network interfaces bridge digital systems to a communication network; they let these digital machines leverage the communication capacities of computer networks.\\
+
+        Whilst almost all engineers could recognize what a NIC physically is, the matter is not that simple regarding how the OS treats these interfaces. We find it quite helpful to think of what we would do if we had to implement some software solutions that had to employ network's capabilities. There must be a "way" that these hardware components can be used from the application perspective, that is, the OS needs to offer some kind of abstraction through which we can make use of the NIC itself. This abstraction is what we will call a OS-level NIC or network interface.\\
+
+        Before delving any deeper into this matter we need to discuss what the \texttt{iproute2} suite is as we believe adding some examples to the contents to follow would really enrich them.
+
+        \subsection{Meeting \texttt{iproute2}}
+            The time we spend on terminal emulators has exponentially increased as we worked our way through our bachelor's. Even though they provide quite a fast way to "get around" the computer they can be a little abstract at times. We are always aware that the OS "under" us has many running processes and provides us with services that can be used at our request. The thing is, faith can at times be scarce so we usually have tools that can inform us about what's going on "behind the scenes". This is the case for programs like \texttt{ps} which reports the status of the system's processes or \texttt{w} which tells us about who is currently logged on the system as well as what they are up to. When using a shell we are aware of the fact that other processes are running and that other users may be logged on but we nonetheless have tools that let us consult the current status of the system.\\
+
+            Where networking is concerned, \texttt{iproute2} is like a Swiss Army Knife. It's a \textit{suite} or collection of tools that lets us do everything from inspecting the current interfaces and routes to generating \texttt{IPv6/IPv4} tunnels. We'll only be concerned with the \texttt{ip} command in our case which is in charge of "showing / manipulating routing, network devices, interfaces and tunnels" as seen in \texttt{ip}'s manpage (which can be consulted with \texttt{man ip}).
