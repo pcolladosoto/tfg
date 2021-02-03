@@ -10,3 +10,6 @@
 
 # Get rid of minted's trash
 _minted-main
+
+# Get rid of Word files
+*.docx
