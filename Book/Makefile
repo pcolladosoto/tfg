@@ -1,6 +1,6 @@
 # Makefile for compiling the End-of-degree project (TFG)
 
-CHAPTERS = $(addprefix Chapters/Ch_, 1 ) # pipes dispatcher worker gatherer fifos)
+CHAPTERS = $(addprefix Chapters/Ch_, 1 2)
 
 # Trashy file formats
 TRASH = *.aux *.ist *.log *.out *.sbl *.acn
