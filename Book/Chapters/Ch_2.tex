@@ -30,53 +30,62 @@
 
         Many of the programming languages dominating today's market are object oriented. This, very roughly, means that the programmer is expected to generate \textit{classes} representing "real-life" entities to some extent. These classes are defined by their \textit{attributes} (characteristics) and their \textit{methods} (what they can do). Now, a class by itself cannot do anything, we need to \textit{instantiate} it so that we create an \textit{object} of that class. We'll then be capable of using the newly created object as we please.\\
 
-        This concept of instantiation is actually quite powerful as it appears continuously in many areas of engineering. Now, we could say that Linux's network namespaces work in a similar fashion to classes. We can think of the network stack as the class and what we call \textit{network namespaces} as the objects. Let's delve a bit deeper into what these namespaces really are.\\
+        This concept of instantiation is actually quite powerful as it appears continuously in many areas of engineering. Now, we could say that Linux's network namespaces work in a similar fashion to classes. We can think of the network stack as the class and what we call \textit{network namespaces} as the objects.\\
 
         As seen \href{https://en.wikipedia.org/wiki/Linux_namespaces}{here}, namespaces are not only seen when doing networking stuff, they are a feature of the Linux kernel employed in many other areas. These namespaces let us partition kernel resources so that each process sees a resource that's only for it, it's not shared. When applied to networking we can see how each network namespace represents an entire network stack. Then, if we set up several network namespaces (namespaces from now on as this is the only type of namespace we will deal with) we have effectively housed several network stacks under the same roof. If there was any way of interconnecting these namespaces we would have taken quite a dent off our task.\\
 
-        We will now take a look at the virtual wires we have fought so many times against, the so called \texttt{veths}.\\
+        Now, our system will model a network-capable machine as a simple process with its very own network namespace. This sentence can seem "loopy" at best, so let's think about a more down-to-earth scenario through which to understand it better.
 
-    \section{Wire time}
-        In a previous section we already provided some comments on what NICs are. Knowing that interfaces create "bridges" between different systems we can clearly see how these network interfaces bridge digital systems to a communication network; they let these digital machines leverage the communication capacities of computer networks.\\
+        \subsection{A common \texttt{HTTP} server}
+            The \texttt{Internet} has revolutionized society in ways little people could have predicted. It supports many different application protocols such as \texttt{SMTP} and \texttt{FTP}, but one of the most popular (if not the most) is \texttt{HTTP(S)}. This protocol provides the backbone for websites and many other applications that are employed by huge amounts of people on a daily basis.\\
 
-        Whilst almost all engineers could recognize what a NIC physically is, the matter is not that simple regarding how the OS treats these interfaces. We find it quite helpful to think of what we would do if we had to implement some software solutions that had to employ network's capabilities. There must be a "way" that these hardware components can be used from the application perspective, that is, the OS needs to offer some kind of abstraction through which we can make use of the NIC itself. This abstraction is what we will call a OS-level NIC or network interface.\\
+            Like many other protocols, \texttt{HTTP(S)} leverages the \textit{client-server} architecture. The client role is usually "played" by web browsers such as \texttt{Firefox} or \texttt{Safari}, whilst the server part is relegated to programs such as \texttt{Apache} and \texttt{Nginx}. From a networking point of view, a process is univocally addressed through an \texttt{IP address} and a \texttt{port number}. The former identifies a given machine within a network whilst the latter targets a process running within that machine. Then, we can have different servers running on a \textit{physical} machine as long as their port numbers differ. We begin to see how, from a strict networking point of view, we can have several \textit{logical} entities supported by a single \textit{physical} one.\\
 
-        Before delving any deeper into this matter we need to discuss what the \texttt{iproute2} suite, as it's through it that we'll control the entire virtual network infrastructure we are to work with.
+            Now, imagine that we want or need to run two \texttt{HTTP(S)} servers on a single machine and a single port number. That wouldn't be possible, would it? Now, if we leverage the concept of the network namespace we can circumvent this limitation. We could, for example, instantiate two different namespaces for each of the server processes and then bind each of them to the same port \textbf{within the respective namespaces}. Then, a network-aware process together with its own network namespace is, in a way, a full-fledged logical entity within a network: it's addressed by its own \texttt{IP address} and it has it's own pool of independent \texttt{port numbers}. This is exactly what our framework exploits: each virtual host is a simple process running within its very own namespace.\\
 
-        \subsection{Meeting \texttt{iproute2}}
-            The time we spend on terminal emulators has exponentially increased as we worked our way through our bachelor's. Even though they provide quite a fast way to "get around" the computer they can be a little abstract at times. We are always aware that the OS "under" us has many running processes and provides us with services that can be used at our request. The thing is, faith can at times be scarce so we usually have tools that can inform us about what's going on "behind the scenes". This is the case for programs like \texttt{ps} which reports the status of the system's processes or \texttt{w} which tells us about who is currently logged on the system as well as what they are up to. When using a shell we are aware of the fact that other processes are running and that other users may be logged in but we nonetheless have tools that let us consult the current status of the system.\\
+        The above was one of the main reasons we vouched for \textit{containers} as a technology before. Each container ships with its own network namespace when it comes to networking. Whilst it's true that \textit{docker} does bring up some network infrastructure with a new container, we can explicitly avoid that to be given a "pure" namespace with each new container. We can then manually instantiate any other network elements we might need to complete the network topology we are to build.\\
 
-            Where networking is concerned, \texttt{iproute2} is like a Swiss Army Knife. It's a \textit{suite} or collection of tools that lets us do everything from inspecting the current interfaces and routes to generating \texttt{IPv6/IPv4} tunnels. We'll only be concerned with the \texttt{ip} command in our case which is in charge of "showing/manipulating routing tables, network devices, interfaces and tunnels" as seen in \texttt{ip}'s manpage (which can be consulted with \texttt{man ip}). The uses one can give to \texttt{iproute2} are seemingly endless, but before getting into them we believe it would be useful to compare the \texttt{iproute2} suite to its predecessor: \texttt{net-tools}.
+        Managing namespaces and instantiating the virtual network elements, such as \texttt{veths}, gluing them together is attainable with the help of the \texttt{iproute2} suite of tools. We'll then look into how to leverage \texttt{iproute2} for our needs.\\
 
-            \subsubsection{The ever pervasive \texttt{ifconfig}}
-                Querying a system's interfaces is a very common task in the day of a network engineer. Whenever internet connectivity is playing up or network connections don't seem to be working as intended, our initial step is to check interfaces are configured as they should. On \texttt{unix-based} systems such as \texttt{macOS} and \texttt{GUN/Linux} this was traditionally accomplished with the \texttt{ifconfig} command. Before \texttt{iproute2} was implemented, network-related tools fulfilling the same purpose were provided by the \texttt{net-tools} suite. Among the most well-known tools provided by it we can mention \texttt{ifconfig} and \texttt{netstat}. The former displayed information on the system's network interfaces whilst the latter shed light on the open sockets in the system. When working with network-centric applications such as web-servers, \texttt{netstat} was a superb way of finding out whether some process had \texttt{binded} (i.e. began listening) to the \texttt{80} or \texttt{443} ports, each being the default for the \texttt{HTTP} and \texttt{HTTPS} protocols, respectively. With time, \texttt{iproute2} became available and it \textit{deprecated} the \texttt{net-tools} suite. We have nonetheless observed throughout our studies that a non-negligible amount of people are reluctant to abandon \texttt{ifconfig} and related tools.
+    \section{Meeting \texttt{iproute2}}
+        The time we spend on terminal emulators has exponentially increased as we worked our way through our bachelor's. Even though they provide quite a fast way to "get around" the computer they can be a little abstract at times. We are always aware that the OS "under" us has many running processes and provides us with services that can be used at our request. The thing is, faith can at times be scarce so we usually have tools that can inform us about what's going on "behind the scenes". This is the case for programs like \texttt{ps} which reports the status of the system's processes or \texttt{w} which tells us about who is currently logged on the system as well as what they are up to. When using a shell we are aware of the fact that other processes are running and that other users may be logged in but we nonetheless have tools that let us consult the current status of the system.\\
 
-                What we are trying to achieve with this project is possible if leveraging \texttt{net-tools} instead of \texttt{iproute2}. However, the former's documentation and examples tend to be more cryptic and harder to digest. What's more, even though people resist to stop using it, \texttt{net-tools} is bound to disappear. That's why using the newer network tools confers a longer life prospect to our tool.
+        Where networking is concerned, \texttt{iproute2} is like a Swiss Army Knife. It's a \textit{suite} or collection of tools that lets us do everything from inspecting the current interfaces and routes to generating \texttt{IPv6/IPv4} tunnels. We'll only be concerned with the \texttt{ip} command in our case which is in charge of "showing/manipulating routing tables, network devices, interfaces and tunnels" as seen in \texttt{ip}'s manpage (which can be consulted with \texttt{man ip}). The uses one can give to \texttt{iproute2} are seemingly endless, but before getting into them we believe it would be useful to compare the \texttt{iproute2} suite to its predecessor: \texttt{net-tools}.\\
 
-                Even though \texttt{net-tools} has been deprecated on \texttt{linux-based} systems, it's still the selected network tool suite for systems such as \texttt{macOS} where \texttt{iproute2} is \textbf{available}. Some programs such as \texttt{iproute2mac} do exist for this operating system, but they just \textit{parse} (i.e. process) the output provided by \texttt{net-tools} utilities and present it following \texttt{iproute2}'s format. We mustn't be deceived by looks: \texttt{iproute2} is a part of \textbf{\texttt{linux}} systems.
+        \subsection{Describing a network interface}
+            In a previous section we already provided some comments on what NICs are. Knowing that interfaces create "bridges" between different systems we can clearly see how these network interfaces bridge digital systems to a communication network; they let these digital machines leverage the communication capacities of computer networks.\\
 
-                We compare both suites on the table \ref{tab:net-tools-vs-iproute2} as provided by \href{https://www.thegeekdiary.com/comparing-net-tools-v-s-iproute-package-commands/}{this site}.
+            Whilst almost all engineers could recognize what a NIC physically is, the matter is not that simple regarding how the OS treats these interfaces. We find it quite helpful to think of what we would do if we had to implement some software solutions that had to employ network's capabilities. There must be a "way" that these hardware components can be used from the application perspective, that is, the OS needs to offer some kind of abstraction through which we can make use of the NIC itself. This abstraction is what we will call a OS-level NIC or network interface.\\
 
-                \begin{table}
-                    \centering
-                    \begin{tabular}{|c|c|}
-                        \hline
-                        \textbf{net-tools} & \textbf{iproute2}\\
-                        \hline
-                        \texttt{arp} & \texttt{ip neigh}\\
-                        \hline
-                        \texttt{ifconfig} & \texttt{ip addr}, \texttt{ip link}, \texttt{ip tunnel}\\
-                        \hline
-                        \texttt{netstat} & \texttt{ss}, \texttt{ip maddr}\\
-                        \hline
-                        \texttt{route} & \texttt{ip route}\\
-                        \hline
-                    \end{tabular}
-                    \caption{\texttt{net-tools} utils vs. \texttt{iproute2}'s}
-                    \label{tab:net-tools-vs-iproute2}
-                \end{table}
+        \subsection{The ever pervasive \texttt{ifconfig}}
+            Querying a system's interfaces is a very common task in the day of a network engineer. Whenever internet connectivity is playing up or network connections don't seem to be working as intended, our initial step is to check interfaces are configured as they should. On \texttt{unix-based} systems such as \texttt{macOS} and \texttt{GUN/Linux} this was traditionally accomplished with the \texttt{ifconfig} command. Before \texttt{iproute2} was implemented, network-related tools fulfilling the same purpose were provided by the \texttt{net-tools} suite. Among the most well-known tools provided by it we can mention \texttt{ifconfig} and \texttt{netstat}. The former displayed information on the system's network interfaces whilst the latter shed light on the open sockets in the system. When working with network-centric applications such as web-servers, \texttt{netstat} was a superb way of finding out whether some process had \texttt{binded} (i.e. began listening) to the \texttt{80} or \texttt{443} ports, each being the default for the \texttt{HTTP} and \texttt{HTTPS} protocols, respectively. With time, \texttt{iproute2} became available and it \textit{deprecated} the \texttt{net-tools} suite. We have nonetheless observed throughout our studies that a non-negligible amount of people are reluctant to abandon \texttt{ifconfig} and related tools.
 
-            Knowing a bit about what \texttt{iproute2} is, we believe walking through some examples showing how to instantiate virtual network elements will prove rather revealing.
+            What we are trying to achieve with this project is possible if leveraging \texttt{net-tools} instead of \texttt{iproute2}. However, the former's documentation and examples tend to be more cryptic and harder to digest. What's more, even though people resist to stop using it, \texttt{net-tools} is bound to disappear. That's why using the newer network tools confers a longer life prospect to our tool.
+
+            Even though \texttt{net-tools} has been deprecated on \texttt{linux-based} systems, it's still the selected network tool suite for systems such as \texttt{macOS} where \texttt{iproute2} is \textbf{available}. Some programs such as \texttt{iproute2mac} do exist for this operating system, but they just \textit{parse} (i.e. process) the output provided by \texttt{net-tools} utilities and present it following \texttt{iproute2}'s format. We mustn't be deceived by looks: \texttt{iproute2} is a part of \textbf{\texttt{linux}} systems.
+
+            We compare both suites on the table \ref{tab:net-tools-vs-iproute2} as provided by \href{https://www.thegeekdiary.com/comparing-net-tools-v-s-iproute-package-commands/}{this site}.
+
+            \begin{table}
+                \centering
+                \begin{tabular}{|c|c|}
+                    \hline
+                    \textbf{net-tools} & \textbf{iproute2}\\
+                    \hline
+                    \texttt{arp} & \texttt{ip neigh}\\
+                    \hline
+                    \texttt{ifconfig} & \texttt{ip addr}, \texttt{ip link}, \texttt{ip tunnel}\\
+                    \hline
+                    \texttt{netstat} & \texttt{ss}, \texttt{ip maddr}\\
+                    \hline
+                    \texttt{route} & \texttt{ip route}\\
+                    \hline
+                \end{tabular}
+                \caption{\texttt{net-tools} utils vs. \texttt{iproute2}'s}
+                \label{tab:net-tools-vs-iproute2}
+            \end{table}
+
+        Knowing a bit about what \texttt{iproute2} is, we believe walking through some examples showing how to instantiate virtual network elements will prove rather revealing.
 
     \section{Instantiating virtual network elements}
         As \texttt{iproute2} offers us total control over a machine's internal network infrastructure, we believe the best way to showcase what we can do is through example. Before getting down to the "command level" of things, let's get some naming conventions out of the way.
@@ -136,7 +145,7 @@
             We would like to draw the reader's attention to the \texttt{LOWER\_UP} string found on \texttt{ip link}'s output on listing \ref{lst:bridge-creation}, as it's letting us know that the newly created \texttt{bridge} is indeed up. On top of that, we would also like to note that the backslash (\texttt{\textbackslash}) characters found on \texttt{ip link}'s output are \textbf{not} present on the "real" output. We have included them out of necessity, given the output lines were too long to be displayed in a single line in this document. We decided to indicate where we had broken up the line in an effort to be true to the original text whilst making it more visually appealing. This small "tweak" has been applied on other listings such as \ref{lst:veth-creation}.
 
         \subsection{\texttt{Veths}}
-            Now that we know how to create \texttt{bridges} it's time to instantiate the "wires" connecting all of them together. Just like we explained before, these "wires" are supported on \texttt{veths}. The creation process is very similar to that of bridges in the sense that we'll leverage \texttt{ip link}'s functionality. Listing \ref{lst:veth-creation} shows how these veths are created.
+            Now that we know how to create \texttt{bridges} it's time to instantiate the "wires" connecting all of them together. Just like we explained before, these "wires" are supported on \texttt{veths}. The creation process is very similar to that of bridges in the sense that we'll leverage \texttt{ip link}'s functionality. Listing \ref{lst:veth-creation} shows how these \texttt{veths} are created. From \texttt{iproute2}'s perspective, these \texttt{veths} manifest as two different interfaces that are nonetheless very intimately related. Just like we explained before, everything that enters one \texttt{veth} end will go out the other and vice versa. This relation is made clear by how these \texttt{veths} are displayed when querying the network configuration as seen on listing \ref{lst:veth-creation}.
 
             \begin{lstlisting}[language = bash, caption = Instantiating a Virtual Ethernet Interface., label = lst:veth-creation]
                 # Create a new veth whose ends are named veth-end-x and
@@ -161,4 +170,6 @@
                     # link/ether de:16:80:f6:c3:64 brd ff:ff:ff:ff:ff:ff
             \end{lstlisting}
 
-            When looking at listing \ref{lst:veth-creation} we fin that, just like in listing \ref{lst:bridge-creation}, the \texttt{LOWER\_UP} string is telling us that both \texttt{veth} ends are up and running. We would also like to bring the reader's attention to the \texttt{@veth-end-[x/y]} suffix in both \texttt{veth} names. This is just telling us the name of the other \texttt{veth} end associated with this one. In other words, \texttt{veth-end-y@veth-end-x} tells us that the \texttt{veth} whose configuration we are currently inspecting (i.e. \texttt{veth-end-y}) is attached to \texttt{veth-end-x}. Nonetheless, we need not specify this suffix when referring to the \texttt{veth} ends during configuration. Note we didn't include it on lines $5$ and $6$ on the same listing.
+            When looking at listing \ref{lst:veth-creation} we find that, just like in listing \ref{lst:bridge-creation}, the \texttt{LOWER\_UP} string is telling us that both \texttt{veth} ends are up and running. We would also like to bring the reader's attention to the \texttt{@veth-end-[x/y]} suffix in both \texttt{veth} names. This is just telling us the name of the other \texttt{veth} end associated with this one. In other words, \texttt{veth-end-y@veth-end-x} tells us that the \texttt{veth} whose configuration we are currently inspecting (i.e. \texttt{veth-end-y}) is attached to \texttt{veth-end-x}. Nonetheless, we need not specify this suffix when referring to the \texttt{veth} ends during configuration. Note we didn't include it on lines $5$ and $6$ on the same listing.
+
+        % TODO: Describe network namespace handling and add content from the wiki
