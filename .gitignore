@@ -13,3 +13,6 @@ _minted-main
 
 # Get rid of Word files
 *.docx
+
+# Get rid of vagrant's stuff
+.vagrant
