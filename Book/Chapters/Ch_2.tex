@@ -301,4 +301,20 @@
 
         We would like to mention that assigning addresses like we do on listing \ref{lst:addr-iface} will also affect the route table of the machine the interface belongs to. We'll delve deeper into this topic when we discuss routing in a later section.
 
-    
+    \section{Adding firewall functionalities to layer 3 devices}
+        The network topologies we are to instantiate come with several restrictions regarding the connections network elements are allowed to establish. These policies will be enforced at the \texttt{network layer} in the different routers we will work with. What's more, we will leverage the \texttt{iptables} tool to filter the different datagrams based on predefined criteria. Given \texttt{iptables} complexity we believe a short discussion on the tool's architecture is appropriate. Please note that the following discussion is heavily based on the contents of \href{https://linux.die.net/man/8/iptables}{\texttt{iptable's manpage}}.
+
+        \subsection{Overview of \texttt{iptables}}
+            Just as its name implies, \texttt{iptables} is organized as a set of tables, each containing rules that are to be applied to incoming packets. Depending on the incoming packet's nature, \texttt{iptables} will make use of one table or other. In our case we will only be dealing with the default \texttt{filter} table. These tables are further organized into \texttt{chains}. The \texttt{filter} table contains the following predefined \texttt{chains}:
+
+            \begin{enumerate}
+                \item \texttt{INPUT}: Its rules are applied to packets destined for \textbf{local sockets}.
+                \item \texttt{OUTPUT}: Its rules are applied to \textbf{locally generated packets}.
+                \item \texttt{FORWARD}: Its rules are applied to \textbf{packets being routed through the machine}.
+            \end{enumerate}
+
+            A table may contain user defined chains as well: if there is something characterizing \texttt{iptables} it would be its versatility.
+
+            One can query the current rules at any time by issuing the \texttt{iptables -L} command or the more specific \texttt{iptables -L <chain-name>} to query the rules for a particular chain. These commands can always be combined with the \texttt{-t <table-name} option, should we want to work with a table other than \texttt{filter} (like the \texttt{nat} table, used for packets creating a connection (such as a \texttt{TCP SYN} segment)).
+
+            These chains will also have an associated \texttt{policy}. The way \texttt{iptables} work is that it will try to apply the most restrictive rule for a given packet. If there is no such a rule, it will fall back to the \texttt{chain}'s \texttt{policy}. End user systems usually have a default policy \texttt{DROP}ping packets that are to be forwarded, for instance. This follows from the fact that a normal host should not be acting as a \texttt{layer 3} router in any case. This can of course be altered thanks to the \texttt{-P} flag that we can use with \texttt{iptables}. Thus, running \texttt{iptables -P FORWARD ACCEPT} would 
