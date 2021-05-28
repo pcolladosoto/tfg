@@ -500,4 +500,26 @@
 
         \subsection{Managing Containers}
             \subsubsection{A Container's Lifecycle}
-                Foo!
+                Understanding the different states in a container's lifespan is the key to managing them. The following enumeration walks the reader through the natural steps a container will follow: from its creation to its removal. The same information is also contained on figure \ref{fig:container-lifecycle} for the more visual readers.
+
+                \begin{enumerate}
+                    \item A container is \texttt{created} with an associated image.
+                    \item An existing container is \texttt{started} so that it begins running a program.
+                    \item A container can be \texttt{run}: this will just \texttt{create} and \texttt{start} it.
+                    \item A currently running container's state can be altered in several ways:
+                    \begin{enumerate}
+                        \item A running container can be \texttt{paused} and then \texttt{unpaused}.
+                        \item A running container can be \texttt{stopped} or \texttt{killed}: this will effectively stop the program running within it.
+                        \item A running container can be \texttt{restarted}.
+                        \item A running container's associated program can also exit, thus \texttt{killing} the container.
+                        \item A running container can also exhaust the resources it's been granted, effectively \texttt{dying}.
+                    \end{enumerate}
+                    \item A stopped or created container can \texttt{removed}. This step is non-reversible: the containers data will be deleted with it.
+                \end{enumerate}
+
+                \begin{figure}
+                    \centering
+                    \includegraphics[width=\linewidth]{container_lifecycle.png}
+                    \caption{Image portraying a \texttt{container}'s lifecycle. \href{https://miro.medium.com/max/1129/1*vca4e-SjpzSL5H401p4LCg.png}{Source}.}
+                    \label{fig:container-lifecycle}
+                \end{figure}
