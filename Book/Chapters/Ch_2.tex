@@ -302,7 +302,9 @@
         We would like to mention that assigning addresses like we do on listing \ref{lst:addr-iface} will also affect the route table of the machine the interface belongs to. We'll delve deeper into this topic when we discuss routing in a later section.
 
     \section{Adding firewall functionalities to layer 3 devices}
-        The network topologies we are to instantiate come with several restrictions regarding the connections network elements are allowed to establish. These policies will be enforced at the \texttt{network layer} in the different routers we will work with. What's more, we will leverage the \texttt{iptables} tool to filter the different datagrams based on predefined criteria. Given \texttt{iptables} complexity we believe a short discussion on the tool's architecture is appropriate. Please note that the following discussion is heavily based on the contents of \href{https://linux.die.net/man/8/iptables}{\texttt{iptable's manpage}}.
+        The network topologies we are to instantiate come with several restrictions regarding the connections network elements are allowed to establish. These policies will be enforced at the \texttt{network layer} in the different routers we will work with. What's more, we will leverage the \texttt{iptables} tool to filter the different datagrams based on predefined criteria. Given \texttt{iptables} complexity we believe a short discussion on the tool's architecture is appropriate. Please note that the following is heavily based on the contents of \href{https://linux.die.net/man/8/iptables}{\texttt{iptable's manpage}}.
+
+        Before diving into \texttt{iptables} we would like to justify our use of the term \texttt{packet} in the following paragraphs. Even though we intend to be as technically precise as possible, doing so when discussing a \texttt{firewall}'s operation can prove to be exasperating. Firewalls are not constrained to a single layer in the \texttt{OSI model}: they can match packets based on the source and destination \texttt{network addresses} of the incoming \texttt{datagram}, the \texttt{transport layer} protocol to which the input \texttt{segment} belongs to or even the \texttt{MAC} address associated with the incoming \texttt{frame}. As these rules can leverage information relative to many architectural layers we feel it is not correct to fit it within a single one of them. On the other hand, explicitly differentiating between the term describing a packet based on the criteria we were using at the time would bog the reader time in a myriad of technicalities that we felt wasn't offering a better understanding in return. Thus, we settled on the use of the term packet for the following discussion: after all, this kind of situations is where packet's ``ambiguity'' excels.
 
         \subsection{Overview of \texttt{iptables}}
             Just as its name implies, \texttt{iptables} is organized as a set of tables, each containing rules that are to be applied to incoming packets. Depending on the incoming packet's nature, \texttt{iptables} will make use of one table or other. In our case we will only be dealing with the default \texttt{filter} table. These tables are further organized into \texttt{chains}. The \texttt{filter} table contains the following predefined \texttt{chains}:
@@ -315,6 +317,87 @@
 
             A table may contain user defined chains as well: if there is something characterizing \texttt{iptables} it would be its versatility.
 
-            One can query the current rules at any time by issuing the \texttt{iptables -L} command or the more specific \texttt{iptables -L <chain-name>} to query the rules for a particular chain. These commands can always be combined with the \texttt{-t <table-name} option, should we want to work with a table other than \texttt{filter} (like the \texttt{nat} table, used for packets creating a connection (such as a \texttt{TCP SYN} segment)).
+            Even though the rules we'll be needing are quite simple, these can get extremely convolved. Rules are composed by a certain \texttt{criteria} and a \texttt{target}. The criteria will be applied to each incoming packet and, if it matches it, the target will be made effective. \texttt{Iptables} applies rules within a chain in a sequential manner: if a rule doesn't match a packet the next one will be applied until there are no more rules left in the chain. If that's the case, the chains \texttt{default policy} will be enforced. We comment a bit more on these policies on a later paragraph. We should end by listing the two \texttt{targets} we will be using in our rules:
 
-            These chains will also have an associated \texttt{policy}. The way \texttt{iptables} work is that it will try to apply the most restrictive rule for a given packet. If there is no such a rule, it will fall back to the \texttt{chain}'s \texttt{policy}. End user systems usually have a default policy \texttt{DROP}ping packets that are to be forwarded, for instance. This follows from the fact that a normal host should not be acting as a \texttt{layer 3} router in any case. This can of course be altered thanks to the \texttt{-P} flag that we can use with \texttt{iptables}. Thus, running \texttt{iptables -P FORWARD ACCEPT} would 
+            \begin{enumerate}
+                \item \texttt{DROP}: According to \texttt{iptable}'s manpage this target ``\texttt{DROPS} the packet to the floor''. That's not ``accurate'' in the sense that nothing goes to the floor really, but the effect is the same: the packet itself will be \textbf{discarded}.
+                \item \texttt{ACCEPT}: This target will cause the packet to the let through.
+            \end{enumerate}
+
+            One can query the current rules at any time by issuing the \texttt{iptables -L} command or the more specific \texttt{iptables -L <chain-name>} to query the rules for a particular chain. These commands can always be combined with the \texttt{-t <table-name>} option, should we want to work with a table other than \texttt{filter} (like the \texttt{nat} table, used for packets creating a connection (such as a \texttt{TCP SYN} segment)).
+
+            As we hinted before, these chains will also have an associated \texttt{policy}. The way \texttt{iptables} work is that it will try to apply the most restrictive rule for a given packet. If there is no such a rule, it will fall back to the \texttt{chain}'s \texttt{policy}. End user systems usually have a default policy \texttt{DROP}ping packets that are to be forwarded, for instance. This follows from the fact that a normal host should not be acting as a \texttt{layer 3} router in any case. This can of course be altered thanks to the \texttt{-P} flag that we can use with \texttt{iptables}. Thus, running \texttt{iptables -P FORWARD ACCEPT} would allow any packets traversing the host through. We then find how the logic behind firewall rules shifts depending on the policy applied to a given chain. If the default policy \texttt{ACCEPT}s packets, we'll instantiate more specific rules to \texttt{DROP} some of them. On the other hand, if the configured policy \texttt{DROP}s packets, we'll then add rules letting some of them through.
+
+            With this background information, we can now analyze the syntax of the rules we will be instantiating on the \texttt{layer 3 routers} that act as firewalls that we will make use of in our virtual topologies.
+
+        \subsection{Instantiating \texttt{iptables} rules}
+            When discussing the main architecture of \texttt{iptables} in the previous section we stated that rules within a chain are \textit{sequentially} applied to a given packet. This implies that the \textbf{order} we add these rules in is crucial: it will determine the fate of the packet. Even though every situation differs from one another, the general rule says that rules are to be added in such a way that ``generality increases with each rule''. In other words, the rules should get more specific as we add them.
+
+            Our scenario is a bit simpler however: none of our rules \textbf{overlap}. By overlapping we mean that, given the criteria for matching packets we will be using, only a \textbf{single rule within a chain} will be applied to a given packet. This implies that, \textbf{in our particular case}, the order we instantiate the rules in is not relevant. What's more, we'll only discriminate packets according to the destination and source \texttt{IP addresses}. This allows us to state that we'll leverage \texttt{iptables} as a \texttt{layer 3 firewall} that's in charge of filtering \texttt{datagrams}.
+
+            We showcase how to add rules to a given chain in listing \ref{lst:iptables-rules}. We have added comments within the listing explaining the effect of the different options. The following enumeration puts the rules' effects into words:
+
+            \begin{enumerate}
+                \item Accept traffic egressing from the host with \texttt{IP 10.0.0.3} and destined to the host with \texttt{IP 10.0.5.4} no matter the \texttt{transport layer} protocol \footnote{\texttt{ICMP} is also considered a transport layer protocol in this case despite not ``fully qualifying'' as one (it is not associated with a port number).} in use.
+                \item Stop traffic egressing from hosts other than \texttt{10.0.0.3} and destined to host \texttt{10.0.5.4}. As it's not specified, this rule applies to every \texttt{transport layer protocol} too.
+            \end{enumerate}
+
+            \begin{lstlisting}[language = bash, caption = Instantiating \texttt{iptables} rules., label = lst:iptables-rules]
+                # Rule 1:
+                    # -I FORWARD: Insert the rule at the beginning of the
+                        # FORWARD chain.
+                    # -j ACCEPT: Matching packets will be accepted.
+                    # -p all: Match any transport layer protocol
+                        # (including ICMP).
+                    # -s 10.0.0.3: Match packets with a source IP of
+                        # 10.0.0.3.
+                    # -d 10.0.5.4: Match packets with a destination
+                        # IP of 10.0.5.4.
+                iptables -I FORWARD -j ACCEPT -p all -s 10.0.0.3 -d 10.0.5.4
+
+                # Rule 2:
+                    # -A FORWARD: Append the rule at the end of the
+                        # FORWARD chain.
+                    # -j ACCEPT: Matching packets will be accepted.
+                    # ! -s 10.0.0.3: Match packets whose source IP is
+                        # NOT 10.0.0.3.
+                    # -d 10.0.5.4: Match packets whose destination IP
+                        # is 10.5.0.4.
+                iptables -A DROP -j ACCEPT ! -s 10.0.0.3 -d 10.0.5.4
+            \end{lstlisting}
+
+            With what we have discussed in this section we can tackle the instantiation of the pertinent firewall rules when they are needed.
+
+        \subsection{A foreword on container capabilities}
+            We usually assume the \texttt{root} user can perform any actions on a given system. However, this is not ``entirely true'' for docker containers. We will need to manually grant them the \texttt{NET\_ADMIN} capability so that these firewall rules can indeed be applied. We will look into \texttt{capabilities} in more detail when discussing containers, but we wanted to point out that \textbf{this} is the only configuration aspect that requires something other than the defaults.
+
+    \section{A Small Caveat: Debugging Connectivity Issues in Virtual Bridges}
+        When we began exploring and testing small virtual network models such as the one we showcase on \ref{chap:3} we stumbled upon a disconcerting issue. Thanks to \href{https://www.wireshark.org}{\texttt{WireShark}} we managed to analyze the packet traces at each of the bridges in an effort to correct the connectivity problems we were facing. It is important to note that the virtual bridges \textbf{remain in the root namespace}. Remember we are only moving \texttt{veths} to the container's network namespace. The other ends will always be added to a virtual bridge that's running within the default namespace belonging to the host.
+
+        % TODO: Add an image showing the correct trace at a virtual bridge.
+
+        Our analysis showed how \texttt{ethernet frames} were indeed reaching the bridges, \textbf{but} they weren't egressing from them. This situation is rather troubling in the sense that nobody really expects a firewall to be effective in a \texttt{layer 2} device. After looking around we stumbled with the \texttt{bridge-nf-call-iptables} system option. This option, which is enabled by default, forces frames traversing virtual bridges to be ``filtered through'' \texttt{iptables}. If one scrutinizes \texttt{iptables' manpage} he or she will find the \texttt{physdev match extension}. This module comes with the \texttt{--physdev-is-bridged} option that would allow a user to configure \texttt{iptables} in such a way that every frame being switched within virtual devices is allowed through. Just like the original writer of \href{http://patchwork.ozlabs.org/project/netdev/patch/1246379267.3749.42.camel@blaa/}{this thread}, we find this to be tremendously counter intuitive.
+
+        Our approach was a bit harsher than configuring the host's \texttt{iptables} implementation: we altogether disabled the filtering of \texttt{ethernet frames} traversing the virtual bridges through \texttt{iptables}. This can easily be accomplished through the \texttt{procfs} interface with the command shown on listing \ref{lst:disable-brd-iptables}. Said listing also contains an option allowing for the permanent change of this setting within a system. We nonetheless chose the former approach so that changes can be reverted in a ``worst-case scenario'' by rebooting the host running the virtual network infrastructure.
+
+        \begin{lstlisting}[language = bash, caption = Disabling bridge calls to \texttt{iptables}., label = lst:disable-brd-iptables]
+            # Disable bridge calls to ipatbles through the procfs
+                # interface. We leverage tee to work around shell
+                # redirection characters such as > not having
+                # elevated privileges when echo is run with sudo.
+            echo 0 | sudo tee \
+                /proc/sys/net/bridge/bridge-nf-call-iptables > /dev/null
+
+            # The above is equivalent to running:
+            sysctl -w net.bridge.bridge-nf-call-iptables=0
+
+            # Make a permanent change to /etc/sysctl.conf and apply it
+            echo "net.bridge.bridge-nf-call-iptables = 0" | \
+                sudo tee -a /etc/sysctl.conf
+            sysctl -p
+        \end{lstlisting}
+
+        Our tool will make sure this kernel feature is disabled before instantiating any virtual network devices.
+
+    \section{The Containers}
+        Time to docker :P
