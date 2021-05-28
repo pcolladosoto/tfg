@@ -399,5 +399,40 @@
 
         Our tool will make sure this kernel feature is disabled before instantiating any virtual network devices.
 
-    \section{The Containers}
-        Time to docker :P
+    \section{The Containers} \label{sec:container-techy}
+        We have previously stated that a container can be regarded as the virtualization of a process. An initial discussion about containers, what they are and what they are not can be found on section \ref{sec:container-intro}. This section ``fills in the holes'' left by the aforementioned one.
+
+        \subsection{Managing Docker}
+            We have chosen to leverage docker's \texttt{CLI} (\texttt{C}ommand \texttt{L}ine \texttt{I}nterface) to manage all the containers we will be dealing with. The set of tools that's offered to us can also be used to query the currently active containers, build images and query container logs among other actions. We are including a non-comprehensive list of commands we will commonly use on table \ref{tab:docker-commands} so that it can be used as a reference for the rest of the section.
+
+            \begin{table}
+                \centering
+                \begin{tabular}{|c|c|}
+                    \hline
+                    \textbf{Command} & \textbf{Description}\\
+                    \hline
+                    \texttt{docker ps -a} & List the status of all existing containers.\\
+                    \hline
+                    \texttt{docker image build ...} & Build an image from a \texttt{Dockerfile}.\\
+                    \hline
+                    \texttt{docker exec ...} & Execute a command within a \textbf{running} container.\\
+                    \hline
+                    \texttt{docker run ...} & Create and run a new container.\\
+                    \hline
+                    \texttt{docker start ...} & Start an existing stopped container.\\
+                    \hline
+                    \texttt{docker stop ...} & Stop a running container.\\
+                    \hline
+                    \texttt{docker rm ...} & Remove an stopped container.\\
+                    \hline
+                \end{tabular}
+                \caption{Basic docker commands.}
+                \label{tab:docker-commands}
+            \end{table}
+
+            Commands listed on table \ref{tab:docker-commands} will be expanded on as we work our way through this section.
+
+        \subsection{Container Images}
+            The application a docker container runs together with its dependencies is packed into an \texttt{image}. Then, \textit{a docker container runs an image}. We can once again leverage the \texttt{class-instance} concept soaking the object oriented programming paradigm and regard the \texttt{images} as the container classes and the running containers themselves as instances of the \texttt{image} they are running.
+
+            Images themselves need to be built before a container can run them. The process docker is to follow to build a given image is specified in a \texttt{Dockerfile}. We are including the one we use for building the images for our nodes on listing \ref{lst:node-dockerfile}. It is rather common to build and image \textit{based on} a preexisting one. That is exactly what we do: we use a ``vanilla'' (i.e. plain) \texttt{Ubuntu image} and then tweak it to our needs as can be seen on listing \ref{lst:node-dockerfile}. Even though it is not our case, it is worth mentioning one can use the \texttt{docker pull} command to download prebuilt images from sites such as \href{https://hub.docker.com}{Docker Hub}.
