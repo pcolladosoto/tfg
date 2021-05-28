@@ -413,7 +413,7 @@
                     \hline
                     \texttt{docker ps -a} & List the status of all existing containers.\\
                     \hline
-                    \texttt{docker image build ...} & Build an image from a \texttt{Dockerfile}.\\
+                    \texttt{docker build ...} & Build an image from a \texttt{Dockerfile}.\\
                     \hline
                     \texttt{docker exec ...} & Execute a command within a \textbf{running} container.\\
                     \hline
@@ -435,4 +435,69 @@
         \subsection{Container Images}
             The application a docker container runs together with its dependencies is packed into an \texttt{image}. Then, \textit{a docker container runs an image}. We can once again leverage the \texttt{class-instance} concept soaking the object oriented programming paradigm and regard the \texttt{images} as the container classes and the running containers themselves as instances of the \texttt{image} they are running.
 
-            Images themselves need to be built before a container can run them. The process docker is to follow to build a given image is specified in a \texttt{Dockerfile}. We are including the one we use for building the images for our nodes on listing \ref{lst:node-dockerfile}. It is rather common to build and image \textit{based on} a preexisting one. That is exactly what we do: we use a ``vanilla'' (i.e. plain) \texttt{Ubuntu image} and then tweak it to our needs as can be seen on listing \ref{lst:node-dockerfile}. Even though it is not our case, it is worth mentioning one can use the \texttt{docker pull} command to download prebuilt images from sites such as \href{https://hub.docker.com}{Docker Hub}.
+            Images themselves need to be built before a container can run them. The process docker is to follow to build a given image is specified in a \texttt{Dockerfile}. We are including the one we use for building the images for our routers on listing \ref{lst:router-dockerfile}. It is rather common to build and image \textit{based on} a preexisting one. That is exactly what we do: we use a ``vanilla'' (i.e. plain) \texttt{Ubuntu image} and then tweak it to our needs as can be seen on listing \ref{lst:router-dockerfile}. Even though it is not our case, it is worth mentioning one can use the \texttt{docker pull} command to download prebuilt images from sites such as \href{https://hub.docker.com}{Docker Hub}.
+
+            \begin{lstlisting}[language = python, caption = \texttt{Dockerfile} for our virtual routers., label = lst:router-dockerfile]
+                # Pull a "vanilla" Ubuntu image.
+                FROM ubuntu
+
+                # Install the required dependencies:
+                    # iputils-ping -> Install the ping command both for
+                        # testing and demonstration purposes.
+                    # openssh-server -> Allow incoming SSH connections.
+                        # The client is installed by default.
+                    # iptables -> Allow turning the routers into firewalls.
+                    # daemonize -> Turns any program (ping in our case)
+                        # into a daemon.
+                RUN \
+                    apt-get update && \
+                    apt-get install -y iputils-ping && \
+                    apt-get install -y openssh-server && \
+                    apt-get install -y iptables && \
+                    apt-get install -y daemonize && \
+
+                    # Make the /run/sshd directory needed by the SSH daemon.
+                    mkdir /run/sshd && \
+
+                    # Allow others to log in as root into this machine.
+                    echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
+
+                # Set root's password to 1234.
+                RUN ["/bin/bash", "-c", "echo -e '1234\n1234' | passwd root"]
+
+                # Copy necessary files into the container.
+                ADD moving_adjustments.sh /moving_adjustments.sh
+
+                # Set root's home directory.
+                ENV HOME /root
+
+                # Default command at startup (i.e. run the SSH daemon).
+                CMD ["/usr/sbin/sshd", "-D"]
+            \end{lstlisting}
+
+            \subsubsection{Building the Images}
+                As seen on the second command on table \ref{tab:docker-commands}, we need to make use of the \texttt{docker build} command. We just need to be aware of two arguments.
+                
+                The \texttt{-t} option allows us to \textbf{name} the built image. This is the name we will later use when selecting this image to be run within a new container. We can optionally \textbf{tag} this image if we use the \texttt{name:tag} syntax with the \texttt{-t} option. This is handful for building several different versions of the same image. We, however, haven't made use of this feature.
+
+                We also need to specify the path to the \texttt{Dockerfile} itself. This is commonly specified as \texttt{.} (i.e. the \textit{working directory}), which implies we are running \texttt{docker build} within the same directory our \texttt{Dockerfile} is in. We will however run the command from a directory other than the one holding the \texttt{Dockerfile}, which calls for a path being passed as the second argument.
+
+                All in all, our command is shown on listing \ref{lst:docker-build-cmd}. The images our containers will run are:
+
+                \begin{itemize}
+                    \item \texttt{ubuntu\_node}: Image run by regular virtual end systems (i.e. hosts).
+                    \item \texttt{ubuntu\_router}: Image run by our virtual routers. This image is built from the \texttt{Dockerfile} displayed on listing \ref{lst:router-dockerfile}.
+                \end{itemize}
+
+                \begin{lstlisting}[language = bash, caption = Building an image from a \texttt{Dockerfile}., label = lst:docker-build-cmd]
+                    docker image build -t <image-name> /path/to/Dockerfile
+                \end{lstlisting}
+
+            \subsubsection{Managing Built Images}
+                Once images are built we can leverage the \texttt{docker images} command to list the ones currently available to us. If everything went well, the image we built with the command shown on listing \ref{lst:docker-build-cmd} should show up in this list identified by the name provided to the \texttt{-t} option. This command's output will also show the image's \texttt{ID}: an hexadecimal string univocally identifying it. This can often be used instead of the image's name.
+
+                We can also make use of the \texttt{docker rmi} command to delete a built image. We can specify the image we want to remove through either its name or id.
+
+        \subsection{Managing Containers}
+            \subsubsection{A Container's Lifecycle}
+                Foo!
