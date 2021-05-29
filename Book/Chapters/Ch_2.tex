@@ -460,9 +460,11 @@
                     mkdir /run/sshd && \
 
                     # Allow others to log in as root into this machine.
+                        # Note the default user is indeed root him/herself.
                     echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 
                 # Set root's password to 1234.
+                    # echo's -e option allows the use of escape sequences (\n).
                 RUN ["/bin/bash", "-c", "echo -e '1234\n1234' | passwd root"]
 
                 # Copy necessary files into the container.
@@ -472,6 +474,7 @@
                 ENV HOME /root
 
                 # Default command at startup (i.e. run the SSH daemon).
+                    # The -D option prevents sshd from daemonizing.
                 CMD ["/usr/sbin/sshd", "-D"]
             \end{lstlisting}
 
@@ -480,7 +483,7 @@
                 
                 The \texttt{-t} option allows us to \textbf{name} the built image. This is the name we will later use when selecting this image to be run within a new container. We can optionally \textbf{tag} this image if we use the \texttt{name:tag} syntax with the \texttt{-t} option. This is handful for building several different versions of the same image. We, however, haven't made use of this feature.
 
-                We also need to specify the path to the \texttt{Dockerfile} itself. This is commonly specified as \texttt{.} (i.e. the \textit{working directory}), which implies we are running \texttt{docker build} within the same directory our \texttt{Dockerfile} is in. We will however run the command from a directory other than the one holding the \texttt{Dockerfile}, which calls for a path being passed as the second argument.
+                We also need to specify the path to the directory containing the \texttt{Dockerfile} itself. This is commonly specified as \texttt{.} (i.e. the \textit{working directory}), which implies we are running \texttt{docker build} within the same directory our \texttt{Dockerfile} is in. We will, however, run the command from a directory other than the one holding the \texttt{Dockerfile}, which calls for the explicit path to the \texttt{Dockerfile} being passed as an argument to the \texttt{-f} option.
 
                 All in all, our command is shown on listing \ref{lst:docker-build-cmd}. The images our containers will run are:
 
@@ -490,7 +493,10 @@
                 \end{itemize}
 
                 \begin{lstlisting}[language = bash, caption = Building an image from a \texttt{Dockerfile}., label = lst:docker-build-cmd]
-                    docker image build -t <image-name> /path/to/Dockerfile
+                    # This command is to be run form the directory containig
+                        # any files we are ADDing or COPYing to within the
+                        # Dockerfile.
+                    docker image build -t <image-name> -f /path/to/Dockerfile .
                 \end{lstlisting}
 
             \subsubsection{Managing Built Images}
@@ -514,7 +520,7 @@
                         \item A running container's associated program can also exit, thus \texttt{killing} the container.
                         \item A running container can also exhaust the resources it's been granted, effectively \texttt{dying}.
                     \end{enumerate}
-                    \item A stopped or created container can \texttt{removed}. This step is non-reversible: the containers data will be deleted with it.
+                    \item A stopped or created container can \texttt{removed}. This step is non-reversible: the container's data will be deleted with it.
                 \end{enumerate}
 
                 \begin{figure}
@@ -523,3 +529,60 @@
                     \caption{Image portraying a \texttt{container}'s lifecycle. \href{https://miro.medium.com/max/1129/1*vca4e-SjpzSL5H401p4LCg.png}{Source}.}
                     \label{fig:container-lifecycle}
                 \end{figure}
+
+            \subsubsection{Docker's Internal Networks}
+                The avid reader might have noticed how, after installing \texttt{docker} on an end system the output of the \texttt{ip addr} command within the machine has a different output: the \texttt{docker0} interfce is added as a gateway for the containers allowing them to reach the ``outside world''. What's more, after installing \texttt{docker} the \texttt{iptables} rules on the machine change as well. Running \texttt{iptables -L} shows a myriad of new \texttt{chains} with names such as \texttt{DOCKER-USER} and things along the lines of \texttt{DOCKER-ISOLATION-STAGE-*}. This approach to networking does simplify the issues one might run into when trying to make a ``normal'' use of a network, that is, when someone wants to either isolate a container from the external network or provide outwards connectivity. This is by no means our endeavour: we want to work with arbitrarily complex network topologies.
+
+                In the realm of technology one often finds that simplifying the operation of a given software system implies making assumptions and avoiding exposing configuration parameters to the end user. Whilst this is a totally reasonable approach it is \textbf{not} one suited to us. This justifies the fact that we discarded the preexisting \texttt{docker network} model. This translates into us passing the \texttt{--network none} option to commands such as \texttt{docker run}, for instance. Just like when we discussed the role \texttt{kubernetes} plays when orchestrating containers, we feel it is pointless to use a tool only to go against it time and time again.
+
+            \subsubsection{Our Approach}
+                Our framework makes extensive use of the \texttt{docker run} command to both \texttt{create} and \texttt{start} the containers with the same action. The network topologies we are to set up contain a myriad of nodes, so allocating a \texttt{tty} for each of them makes handling things tremendously unwieldy. That is why we will always use the \texttt{-d} option, thus \texttt{detaching} the container. This translates into \texttt{docker} instantaneously returning control of the shell session we are currently using as soon as the container itself is up and running. What's more, we will also run the container with \textbf{no} network connections: remember we will manually set the entire networking infrastructure up. The commands we use to run both types of images, that for routers and nodes, is shown on listing \ref{lst:running-nodes}.
+
+                \begin{lstlisting}[language = bash, caption = Running network nodes., label = lst:running-nodes]
+                    # Running regular network nodes.
+                    docker run -d --name <node-name> --network none ubuntu_node
+
+                    # Running routers.
+                    docker run -d --name <router-name> --network none ubuntu_router
+                \end{lstlisting}
+
+                Running the container in the background poses the question of how we are to ``get inside the container'' to act as a regular user. In other words, how can we log into a \texttt{detached} container? Given \texttt{docker}'s architecture, and the fact that we are running an \texttt{SSH} daemon as the container's main process, we have two options to attain this result.
+
+                \paragraph{Executing Commands Within the Container}
+                    As shown in table \ref{tab:docker-commands}, we can always make use of the \texttt{docker exec} command to execute a command within a running container. If what we want to do is start a \texttt{bash} shell within the container (Ubuntu's default shell) we can just execute the command found on listing \ref{lst:docker-exec}. We can also take a look at the processes running within the container to confirm how \texttt{sshd}'s \texttt{PID} is indeed $1$ (it was the first process to spawn in the container). Aside from that process, we will only see the current \texttt{shell} session together with the \texttt{ps} program too. This approach can of course be leveraged to run single-non interactive commands within the containers. We could for instance run \texttt{docker exec <container-name> ps ax} to list a containers processes, for instance.
+
+                    \begin{lstlisting}[language = bash, caption = Inspecting a container's processes., label = lst:docker-exec]
+                        # Spawning our test container.
+                        docker run -d --name test_node ubuntu_node
+
+                        # Running a shell within it:
+                            # -i: Interactive command (i.e. keep STDIN open).
+                            # -t: Allocate a pseudo-TTY (i.e. a software
+                                # emulated terminal).
+                        docker exec -it test_node bash
+
+                        # Listing the existing processes:
+                            # a: Show all processes with an allocated TTY.
+                            # x: Include processes without an allocated TTY.
+                            # These two options effectively select every process.
+                        ps ax
+
+                        # Sample output:
+                            # PID TTY      STAT   TIME COMMAND
+                            # 1   ?        Ss     0:00 sshd: /usr/sbin/sshd -D \
+                                # [listener] 0 of 10-100 startups
+                            # 13  pts/0    Ss     0:00 bash
+                            # 23  pts/0    R+     0:00 ps ax
+                    \end{lstlisting}
+
+                \paragraph{Login in Through SSH}
+                    We previously explained why our containers were going to run an \texttt{ssh} daemon as their main process. This not only ``keeps them alive'', but it also allows external connections to be made from the outside world. Thus, once we know the \texttt{IP} address associated to a given container we can log into it from the host running \texttt{docker} as long as we do have connectivity with the container itself. If we spawn a container using the same command as the one shown in listing \ref{lst:docker-exec} we can verify how it has been given an \texttt{IP} by the docker daemon with the command found on listing \ref{lst:checking-conatiner-ip}. Then, we can just run \texttt{ssh root@<container-ip>} to log into that machine as we would normally do in any other system. The password is, of course, \texttt{1234} as specified in the \texttt{Dockerfiles} we used to build the images these containers will be running.
+
+                    This aspect shows one of the great strengths of our approach when instantiating the entire networking infrastructure ourselves: we can choose whether to isolate the entire virtual scenario from the outside or not. This would permit or forbid an external user to log into our containers for instance. All we would have to do is add a \texttt{veth} connecting one of the virtual routers and the machine running the conatiners: as simple as that.
+
+                    \begin{lstlisting}[language = bash, caption = Checking a container's \texttt{IP} address., label = lst: checking-container-ip]
+                        docker inspect -f {{.NetworkSettings.IPAddress}} <container-name>
+                    \end{lstlisting}
+
+                \paragraph{Attaching to the Container}  
+                    Can't do it! :P
