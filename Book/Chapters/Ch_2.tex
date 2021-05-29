@@ -517,7 +517,7 @@
                         \item A running container can be \texttt{paused} and then \texttt{unpaused}.
                         \item A running container can be \texttt{stopped} or \texttt{killed}: this will effectively stop the program running within it.
                         \item A running container can be \texttt{restarted}.
-                        \item A running container's associated program can also exit, thus \texttt{killing} the container.
+                        \item A running container's associated program can also exit, thus \texttt{killing} the container. \label{it:proc-death}
                         \item A running container can also exhaust the resources it's been granted, effectively \texttt{dying}.
                     \end{enumerate}
                     \item A stopped or created container can \texttt{removed}. This step is non-reversible: the container's data will be deleted with it.
@@ -529,6 +529,8 @@
                     \caption{Image portraying a \texttt{container}'s lifecycle. \href{https://miro.medium.com/max/1129/1*vca4e-SjpzSL5H401p4LCg.png}{Source}.}
                     \label{fig:container-lifecycle}
                 \end{figure}
+
+                We feel it is extremely important to draw the reader's attention to entry \ref{it:proc-death} in the enumeration describing a container's lifecycle. The fact that the exit of a container's main process effectively stops it implies that we can indeed stop containers through means not depending on the \texttt{docker stop} command. Given we are running an \texttt{ssh} daemon within the containers, we can log in as \texttt{root} and then issue \texttt{kill 1} to effectively stop the container. After all, \texttt{docker stop} will send the \texttt{SIGTERM} signal to the process running within the container and, should it not behave appropriately, \texttt{SIGKILL} after a configurable delay. Even though this subtlety will not impact the use we make of the virtual environments we are to work with it is a crucial aspect to bear in minf to fully understand the lifecylce of containers.
 
             \subsubsection{Docker's Internal Networks}
                 The avid reader might have noticed how, after installing \texttt{docker} on an end system the output of the \texttt{ip addr} command within the machine has a different output: the \texttt{docker0} interfce is added as a gateway for the containers allowing them to reach the ``outside world''. What's more, after installing \texttt{docker} the \texttt{iptables} rules on the machine change as well. Running \texttt{iptables -L} shows a myriad of new \texttt{chains} with names such as \texttt{DOCKER-USER} and things along the lines of \texttt{DOCKER-ISOLATION-STAGE-*}. This approach to networking does simplify the issues one might run into when trying to make a ``normal'' use of a network, that is, when someone wants to either isolate a container from the external network or provide outwards connectivity. This is by no means our endeavour: we want to work with arbitrarily complex network topologies.
@@ -575,14 +577,17 @@
                             # 23  pts/0    R+     0:00 ps ax
                     \end{lstlisting}
 
-                \paragraph{Login in Through SSH}
-                    We previously explained why our containers were going to run an \texttt{ssh} daemon as their main process. This not only ``keeps them alive'', but it also allows external connections to be made from the outside world. Thus, once we know the \texttt{IP} address associated to a given container we can log into it from the host running \texttt{docker} as long as we do have connectivity with the container itself. If we spawn a container using the same command as the one shown in listing \ref{lst:docker-exec} we can verify how it has been given an \texttt{IP} by the docker daemon with the command found on listing \ref{lst:checking-conatiner-ip}. Then, we can just run \texttt{ssh root@<container-ip>} to log into that machine as we would normally do in any other system. The password is, of course, \texttt{1234} as specified in the \texttt{Dockerfiles} we used to build the images these containers will be running.
+                \paragraph{Logging in Through SSH}
+                    We previously explained why our containers were going to run an \texttt{ssh} daemon as their main process. This not only ``keeps them alive'', but it also allows external connections to be made from the outside world. Thus, once we know the \texttt{IP} address associated to a given container we can log into it from the host running \texttt{docker} as long as we do have connectivity with the container itself. If we spawn a container using the same command as the one shown in listing \ref{lst:docker-exec} we can verify how it has been given an \texttt{IP} by the docker daemon with the command found on listing \ref{lst:checking-container-ip}. Then, we can just run \texttt{ssh root@<container-ip>} to log into that machine as we would normally do in any other system. The password is, of course, \texttt{1234} as specified in the \texttt{Dockerfiles} we used to build the images these containers will be running.
 
-                    This aspect shows one of the great strengths of our approach when instantiating the entire networking infrastructure ourselves: we can choose whether to isolate the entire virtual scenario from the outside or not. This would permit or forbid an external user to log into our containers for instance. All we would have to do is add a \texttt{veth} connecting one of the virtual routers and the machine running the conatiners: as simple as that.
+                    This aspect shows one of the great strengths of our approach when instantiating the entire networking infrastructure ourselves: we can choose whether to isolate the entire virtual scenario from the outside or not. This would permit or forbid an external user to log into our containers for instance. All we would have to do is add a \texttt{veth} connecting one of the virtual routers and the machine running the containers: as simple as that.
 
                     \begin{lstlisting}[language = bash, caption = Checking a container's \texttt{IP} address., label = lst: checking-container-ip]
-                        docker inspect -f {{.NetworkSettings.IPAddress}} <container-name>
+                        docker inspect -f {{.NetworkSettings.IPAddress}}\
+                            <container-name>
                     \end{lstlisting}
 
-                \paragraph{Attaching to the Container}  
-                    Can't do it! :P
+                \paragraph{Attaching to the Container}
+                    We can theoretically leverage a third option: \texttt{attaching} a terminal session to the running container. This will \textbf{not} behave as we would expect however. In our case, attaching a shell to our container would make us ``see'' the \texttt{ssh} daemon we are running as the container's initial process. This would't allow us to perform any actions whatsoever: we wouldn't be attaching ourselves to an interactive process, so it is of very little use. We nonetheless felt it was worthwhile to mention this option did indeed exists: it might prove to be useful under different circumstances.
+
+    The framework for instantiating virtual networks leverages the different technologies we have discussed throughout this chapter. The next one shows a ``toy example'' demonstrating the use of all of them to bring up a simmple topology comprising two containers and a bridge mediating between them.
