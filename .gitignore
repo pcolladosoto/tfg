@@ -16,3 +16,6 @@ _minted-main
 
 # Get rid of vagrant's stuff
 .vagrant
+
+# Get rid of the code repo
+cld_wall/
