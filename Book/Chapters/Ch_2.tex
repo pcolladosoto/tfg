@@ -531,6 +531,13 @@
 
                 We feel it is extremely important to draw the reader's attention to entry \ref{it:proc-death} in the enumeration describing a container's lifecycle. The fact that the exit of a container's main process effectively stops it implies that we can indeed stop containers through means not depending on the \texttt{docker stop} command. Given we are running an \texttt{ssh} daemon within the containers, we can log in as \texttt{root} and then issue \texttt{kill 1} to effectively stop the container. After all, \texttt{docker stop} will send the \texttt{SIGTERM} signal to the process running within the container and, should it not behave appropriately, \texttt{SIGKILL} after a configurable delay. Even though this subtlety will not impact the use we make of the virtual environments we are to work with it is a crucial aspect to bear in minf to fully understand the lifecylce of containers.\\
 
+            \subsubsection{Container Capabilities}
+                Due to the actions we want to perform inside our containers we need to provide them with some capabilities beyond the default ones. In the case of the regular nodes, we need to provide the \texttt{SYS\_ADMIN} capability so that they can change their own hostname with the \texttt{hostname} command. Routers will also need to be granted the \texttt{NET\_ADMIN} capability so that they can configure their own \texttt{iptables} rules. These capabilities are granted to containers when they are run thorough the \texttt{--cap-add} option.\\
+
+                What is more, we need to allow the routers to forward packets through them. Besides instantiating the proper rules in \texttt{iptables} we also need to allow the \texttt{kernel} to process these packets. We can do so through the \texttt{--sysctl} option when running the container, thus enabling \texttt{ip forwarding} with the \texttt{net.ipv4.ip\_forward=1} parameter. This would be equivalent to running \texttt{\allowbreak echo 1 > /proc/sys/net/ipv4/ip\_forward} within an active container. The catch is that \texttt{/proc/sys} is mounted as \texttt{read-only} within containers. This would imply that we need to grant many more capabilities to said container so that we could run \texttt{mount -o remount rw /proc/sys} and then overwrite the option manually. We believe it is more elegant to just configure the options we need when starting the container and that is what we willl do.\\
+
+                In any case, these options can be seen in the commands shown on listing \ref{lst:running-nodes}.\\
+
             \subsubsection{Docker's Internal Networks}
                 The avid reader might have noticed how, after installing \texttt{docker} on an end system the output of the \texttt{ip addr} command within the machine has a different output: the \texttt{docker0} interfce is added as a gateway for the containers allowing them to reach the ``outside world''. What's more, after installing \texttt{docker} the \texttt{iptables} rules on the machine change as well. Running \texttt{iptables -L} shows a myriad of new \texttt{chains} with names such as \texttt{DOCKER-USER} and things along the lines of \texttt{DOCKER-ISOLATION-STAGE-*}. This approach to networking does simplify the issues one might run into when trying to make a ``normal'' use of a network, that is, when someone wants to either isolate a container from the external network or provide outwards connectivity. This is by no means our endeavour: we want to work with arbitrarily complex network topologies.\\
 
@@ -541,10 +548,10 @@
 
                 \begin{lstlisting}[language = bash, caption = Running network nodes., label = lst:running-nodes]
                     # Running regular network nodes.
-                    docker run -d --name <node-name> --network none ubuntu_node
+                    docker run -d --name <node-name> --network --cap-add SYS_ADMIN none ubuntu_node
 
                     # Running routers.
-                    docker run -d --name <router-name> --network none ubuntu_router
+                    docker run -d --name <router-name> --network none --cap-add SYS_ADMIN --cap-add NET_ADMIN --sysctl net.ipv4.ip_forward=1 ubuntu_router
                 \end{lstlisting}
 
                 Running the container in the background poses the question of how we are to ``get inside the container'' to act as a regular user. In other words, how can we log into a \texttt{detached} container? Given \texttt{docker}'s architecture, and the fact that we are running an \texttt{SSH} daemon as the container's main process, we have two options to attain this result.\\
