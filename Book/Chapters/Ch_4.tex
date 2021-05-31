@@ -1,6 +1,18 @@
-\chapter{Automating the Deployment of Virtual Networks}
+\chapter{Automating the Deployment of Virtual Networks} \label{chap:4}
     \section{High Level Overview}
+        As seen in chapter \ref{chap:3}, bringing a virtual network up entails an organizational overhead that is not easily handled. That is why we have developed a complete software system capable of handling these intricacies in an automatic fashion. Then, a user need only provide a \texttt{graph} describing the desired topology and our project will be able to read, interpret and instantiate said network.\\
+
+        Due to its simple yet rich syntax, we have decided to leverage the \href{https://www.python.org}{\texttt{Python}} programming language to develop the entire system. We will be using version \texttt{3.x} given \texttt{python}'s \texttt{2.7} release has been deprecated as of \textit{January 2021}. One of the external dependencies we will make use of is the \href{https://networkx.org}{\texttt{NetworkX}} network analysis module. This software bundle was recommended by the research group we have collaborated with and it is distributed as a \texttt{python package}. Thus, we felt even more inclined towards \texttt{python}. Given we will interact with the \texttt{docker engine} through its \texttt{CLI API}, its use will not impose any restrictions on our choice either. This implies that we have nothing more than reasons supporting the use of \texttt{python} for our development.\\
+
         \subsection{External Dependencies}
+            One of the main objectives pursued throughout the development was reducing the number of external dependencies to the maximum extent. We did manage to only require the presence of \texttt{docker}, \texttt{iproute2} and \texttt{python3} for an initial and fully functional version. Not leveraging \texttt{NetworkX} implied we had to manually route all the nodes within the network, which amounted to be a rather complex task. Due to the research group's suggestions we settled on taking advantage of \texttt{NetworkX} for both modeling the different topologies and routing them. Then, we have designed two independent solutions that accomplish the same task. One of them \textbf{does not} require \texttt{NetworkX} whist the other one \textbf{does}. The reasoning behind including a dependency that is not strictly needed is that it greatly simplifies our code and it will surely avoid some of the most common pitfalls our own solution can incur into under complex circumstances.\\
+
+            The following enumeration briefly explains the use of each of the required dependencies. Please bear in mind that the installation instructions for each of them are detailed in the document's appendix.
+
+            \begin{enumerate}
+                \item
+            \end{enumerate}
+
         \subsection{User Manual}
     \section{In-depth Module Analysis}
     \section{Working Topologies}
