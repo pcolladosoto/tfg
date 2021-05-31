@@ -1,7 +1,5 @@
 # Makefile for compiling the End-of-degree project (TFG)
 
-CHAPTERS = $(addprefix Chapters/Ch_, 1 2 3)
-
 # Trashy file formats
 TRASH = *.aux *.ist *.log *.out *.sbl *.acn *.lol *.lot *.toc *.lof
 
