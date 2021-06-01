@@ -7,12 +7,131 @@
         \subsection{External Dependencies}
             One of the main objectives pursued throughout the development was reducing the number of external dependencies to the maximum extent. We did manage to only require the presence of \texttt{docker}, \texttt{iproute2} and \texttt{python3} for an initial and fully functional version. Not leveraging \texttt{NetworkX} implied we had to manually route all the nodes within the network, which amounted to be a rather complex task. Due to the research group's suggestions we settled on taking advantage of \texttt{NetworkX} for both modeling the different topologies and routing them. Then, we have designed two independent solutions that accomplish the same task. One of them \textbf{does not} require \texttt{NetworkX} whist the other one \textbf{does}. The reasoning behind including a dependency that is not strictly needed is that it greatly simplifies our code and it will surely avoid some of the most common pitfalls our own solution can incur into under complex circumstances.\\
 
-            The following enumeration briefly explains the use of each of the required dependencies. Please bear in mind that the installation instructions for each of them are detailed in the document's appendix.
+            The following enumeration briefly explains the use of each of the required dependencies. Please bear in mind that the installation instructions for each of them are detailed in the document's appendix.\\
 
             \begin{enumerate}
-                \item
+                \item \textbf{\texttt{Python3}:} With \texttt{python3} being an interpreted language, we need to make use of the interpreter that is going to execute our code.
+                \item \textbf{\texttt{Docker}:} The different nodes in our network are modeled as \texttt{docker containers}, which implies we indeed depend on \texttt{docker} for making our system work.
+                \item \textbf{\texttt{IpRoute2}:} We need the \texttt{iproute2} suite of tools to manage the virtual networking infrastructure ``gluing'' all our nodes together.
+                \item \textbf{\texttt{NetworkX}:} As explained above, we \textit{are not forced} to use \texttt{NetworkX} and we have developed a version that does not depend on it at all. Nonetheless, it does simplify big portions of code and so we decided to include it in our final, sharper version.
+                \item \textbf{\texttt{Matplotlib}:} \texttt{NetworkX} is capable of graphically representing our topologies through \textit{graphs}. In order to ``draw them'', \texttt{NetworkX} depends on the \texttt{matplotlib} module we have also installed as a dependency. This module is however \textbf{not mandatory}: they rest of the program will work as intended, it will just be unable to graphically represent the topology. In a later chapter we will devote our time to looking into a \textit{proof of concept} we have developed. Said experiment generates a series of time-tagged events that our program is capable of representing as a regular graph. The lack of the \texttt{matplotlib} module implies this graph will not be available either. All in all, it is up to the user to decide whether they want this functionality or not: the program itself will carry out is primary task either way.
+                \item \textbf{\texttt{Docker Python SDK}:} We \textbf{have not} used the \texttt{docker python SDK} (\texttt{S}oftware \texttt{D}evelopment \texttt{K}it) in our project. We have decide to leverage \texttt{docker}'s \texttt{CLI} interface from our code through calls to \texttt{os.system()}. However, someone deciding to use our project as a basis for something else might feel more comfortable interacting with \texttt{docker} through a pure-\texttt{python} \texttt{API} (\texttt{A}pplication \texttt{P}rogramming \texttt{I}nterface). Changing our code to work in said fashion is a rather simple task should it have to be done.
             \end{enumerate}
 
         \subsection{User Manual}
+            Throughout the development of our tool we have tried to simplify the use of the project as much as possible. The end result is a user-side workflow that only requires them to import a single project module to which they \textbf{must} provide a \texttt{NetworkX graph}. After doing so, they will be presented with a simple \texttt{CLI} letting them modify the currently live virtual network.\\
+
+            \paragraph{User Permissions}
+                Given the project will make use of \texttt{iproute2} the program needs to be run with administrative privileges (i.e. prepended by \texttt{sudo}). Even though this is the easiest approach and everything will ``just work'' it does have some security implications (mainly command injection) we will showcase in the appendix. Instead of choosing to run the entire blob of code as \texttt{root} we can also grant certain capabilities to the user who is to run the code, namely the \texttt{NET\_ADMIN} capability (the same we need to grant containers). We should also mention that the user running the program must be able to interact with the \texttt{docker engine}. This can be ensured by adding said user to the \texttt{docker group} within the system, even though \texttt{root} will also be able to interact with and manage containers. This paragraph is intended as a warning, please refer to the appendix for a deeper discussion.\\
+
+            Depending on how the users decide to provide the required \texttt{graph} they might need to import additional modules. If they have stored a live graph as a \href{https://docs.python.org/3/library/pickle.html}{\texttt{pickle}} they will then need to import the \texttt{pickle} module to \texttt{un-pickle} the graph, for instance. In our examples we will define the graphs ``on-the-fly'', which requires us to import \texttt{networkx} itself. Listing \ref{lst:sample-topology-graph} shows how one would define the topology found on figure \ref{fig:sample-topology} as a \texttt{networkx} graph.\\
+
+            \begin{lstlisting}[language = python, caption = Defining the Sample Topology as a \texttt{networkx} graph., label = lst:sample-topology-graph]
+                # Import the networkx module so that we can define a graph.
+                import networkx
+
+                # Instantiate the netowrkx.Graph class.
+                sample_net = networkx.Graph(net = 'Sample Topology')
+
+                # Add host H-A-1 and the bridge for subnet A.
+                sample_net.add_node('h-a-1', type = 'node')
+                sample_net.add_node('subnet-a-brd', type = 'bridge', subnet = '10.0.0.0/24')
+
+                # Add host H-B-1 and the bridge for subnet B.
+                sample_net.add_node('h-b-1', type = 'node')
+                sample_net.add_node('subnet-b-brd', type = 'bridge', subnet = '10.0.1.0/24')
+
+                # Add the R-A-B router with NO firewall rules.
+                sample_net.add_node('r-a-b', type = 'router', fw_rules = {})
+
+                # Connect H-A-1 to the bridge for subnet A.
+                sample_net.add_edge('h-a-1', 'subnet-a-brd')
+
+                # Connect H-B-1 to the bridge for subnet B.
+                sample_net.add_edge('h-b-1', 'subnet-b-brd')
+
+                # Connect router R-A-B to both bridges.
+                sample_net.add_edge('subnet-a-brd', 'r-a-b')
+                sample_net.add_edge('subnet-b-brd', 'r-a-b')
+            \end{lstlisting}
+
+            \subsubsection{Creating Well-formed Graphs}
+                Our tool expects the nodes on a \texttt{networkx} graph to adhere to certain constraints so that it can assemble the requested topology. Given the bi-directional nature of network links (data is sent in both directions), we have decided to model our networks as \textbf{undirected graphs}. Then, these will always be composed by a set of \texttt{nodes} interconnected by a set of \texttt{edges}. The types of nodes one can use are listed on table \ref{tab:node-types}.\\
+
+                \begin{table}
+                    \centering
+                    \begin{tabular}{|c|c|}
+                        \hline
+                        \textbf{Node Type} & \textbf{Description}\\
+                        \hline
+                        \texttt{node} & A regular host.\\
+                        \hline
+                        \texttt{bridge} & A link-layer switch that represents an entire subnetwork.\\
+                        \hline
+                        \texttt{router} & A net-layer router joining two or more subnetworks together.\\
+                        \hline
+                    \end{tabular}
+                    \caption{Node types.}
+                    \label{tab:node-types}
+                \end{table}
+
+                When adding a new node one must make sure that the following constraints \textbf{are respected}. Otherwise, all sorts of undefined behavior can and will be experienced: anything from a network that cannot be started to the presence of routing loops can happen.\\
+
+                \begin{enumerate}
+                    \item The node's name is \textbf{unique}.
+                    \item Each subnetwork is composed by a \textbf{single} switch and an arbitrary number of nodes and/or routers.
+                    \item The subnetwork ranges associated to the node if it is a bridge is \textbf{unique}.
+                \end{enumerate}
+
+            \subsubsection{Running a Graph}
+                Once we have defined a graph as we have done on listing \ref{lst:sample-topology-graph} we just need to run it to turn it into a virtual network. This can be accomplished though the \texttt{launch\_net()} function we have defined on the \texttt{net\_tools} module. We will of course analyze these in a later section.\\
+
+                Listing \ref{lst:running-a-graph} shows how a use can run an existing \texttt{networkx} graph like the one defined on listing \ref{lst:sample-topology-graph}.\\
+
+                \begin{lstlisting}[language = python, caption = Turning a graph into a virtual network., label = lst:running-a-graph]
+                    # Importing our module to launch the virtual network
+                    from net_tools import net_ctrl
+
+                    # This line will trigger the virtual network's creation.
+                        # The second parameter controls whether we enable
+                        # the configured firewalls or not.
+                    net_ctrl.launch_net(sample_net, fw_on = False)
+                \end{lstlisting}
+
+            \subsubsection{Configuring Firewalls}
+                When configuring router \texttt{R-A-B} on listing \ref{lst:sample-topology-graph} we passed an empty \texttt{dictionary} \texttt{\{\}} to the \texttt{fw\_rules} parameter thus effectively disabling the firewall of said router.\\
+
+                In order to define appropriate rules, the user needs to provide a \texttt{dictionary} adhering to the syntax specification shown on listing \ref{lst:fw-dict-syntax}.\\
+
+                \begin{lstlisting}[language = python, caption = Syntax for specifying firewall rules., label = lst:fw-dict-syntax]
+                    # Note '|' is to be read as 'OR'
+                    fw_rules = {
+                        'POLICY': 'DROP' | 'ACCEPT',
+                        'ACCEPT': [(RULE_1), (RULE_2), ..., (RULE_N)],
+                        'DROP':   [(RULE_A), (RULE_B), ..., (RULE_Z)]
+                    }
+
+                    # Each rule has a syntax of the form
+                    ('origin_node', 'destination_node', True | False)
+                \end{lstlisting}
+
+                \paragraph{Rule Syntax}
+                    The first $2$ elements are \texttt{strings} containing the names of the origin and destination nodes, respectively. The third parameter acts as a flag controlling whether the rule is uni or bi-directional. If set to \texttt{False}, we will only instantiate a rule affecting traffic going from the origin to the destination. If it is \texttt{True} however we will also instantiate a symmetric rule allowing for two-way communication. Even though the flag is not \textit{explicitly} needed it does reduce the configuration specification tremendously, as the topologies we worked with always made use of symmetric rules. Listing \ref{lst:sym-vs-uni-fw} shows how one can accomplish the same configuration with two rules instead of one if not using said flag.\\
+
+                    \begin{lstlisting}[language = python, caption = Uni-directional vs. symmetric firewall rules., label = lst:sym-vs-uni-fw]
+                        # Enable two-way communication x <--> y.
+                        ('x', 'y', True)
+
+                        # This accomplishes the same result with two triplets.
+                        ('x', 'y', False)
+                        ('y', 'x', False)
+                    \end{lstlisting}
+
+                \paragraph{Dictionary Syntax}
+                    The \texttt{dictionary} contains $3$ key-value pairs. The first one defines the policy for the \texttt{FORWARDING} chain as a \texttt{string}. The second one contains a \texttt{list} of rules for \texttt{ACCEPT}ing packets. If the default policy is set to \texttt{ACCEPT} these rules will be meaningless... The third one contains a \texttt{list} of rules for \texttt{DROP}ping packets. If the default policy is to \texttt{DROP} them these rules will have no effect either.\\
+
+            \subsubsection{Available Commands}
+                
+
     \section{In-depth Module Analysis}
     \section{Working Topologies}
