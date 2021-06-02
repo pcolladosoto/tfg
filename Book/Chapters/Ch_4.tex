@@ -78,9 +78,25 @@
                 When adding a new node one must make sure that the following constraints \textbf{are respected}. Otherwise, all sorts of undefined behavior can and will be experienced: anything from a network that cannot be started to the presence of routing loops can happen.\\
 
                 \begin{enumerate}
-                    \item The node's name is \textbf{unique}.
-                    \item Each subnetwork is composed by a \textbf{single} switch and an arbitrary number of nodes and/or routers.
-                    \item The subnetwork ranges associated to the node if it is a bridge is \textbf{unique}.
+                    \item \textbf{Rules regarding node definitions:}
+                    \begin{enumerate}
+                        \item Each node's name \textbf{MUST} be a \textbf{unique} \texttt{string}.
+                        \item Each node \textbf{MUST} contain a \texttt{type} attribute whose value is a \texttt{string}.
+                        \item The value of the \texttt{type} attribute \textbf{MUST} be one of \texttt{"node"}, \texttt{"router"} or \texttt{"bridge"}.
+                        \item Each bridge \textbf{MUST} contain a \texttt{subnet} attribute.
+                        \item Every value for a \texttt{subnet} attribute \textbf{MUST} be specified as a \texttt{string} with the \texttt{"A.B.C.D/E"} format, where $A,\ B,\ C,\ D \in [0,\ 255];\ E \in [0,\ 30]$.
+                        \item The subnetwork ranges associated to each bridge through the \texttt{subnet} attribute \textbf{MUST} be \textbf{unique}.
+                        \item Each router \textbf{MUST} contain a \texttt{fw\_rules} attribute.
+                        \item Each \texttt{fw\_rules} attribute \textbf{MUST} be set to a \texttt{dictionary} complying to the specifications laid out in section \ref{sec:fw-rules}.
+                    \end{enumerate}
+                    \item \textbf{Rules regarding edge definitions:}
+                    \begin{enumerate}
+                        \item The \texttt{strings} used to identify the nodes to be joined by an edge \textbf{MUST} refer to previously defined nodes.
+                    \end{enumerate}
+                    \item \textbf{Rules regarding the topology:}
+                    \begin{enumerate}
+                        \item Each subnetwork is \textbf{MUST} be composed by a \textbf{single} switch and an arbitrary number of nodes and/or routers.
+                    \end{enumerate}
                 \end{enumerate}
 
             \subsubsection{Running a Graph}
@@ -98,7 +114,7 @@
                     net_ctrl.launch_net(sample_net, fw_on = False)
                 \end{lstlisting}
 
-            \subsubsection{Configuring Firewalls}
+            \subsubsection{Configuring Firewalls} \label{sec:fw-rules}
                 When configuring router \texttt{R-A-B} on listing \ref{lst:sample-topology-graph} we passed an empty \texttt{dictionary} \texttt{\{\}} to the \texttt{fw\_rules} parameter thus effectively disabling the firewall of said router.\\
 
                 In order to define appropriate rules, the user needs to provide a \texttt{dictionary} adhering to the syntax specification shown on listing \ref{lst:fw-dict-syntax}.\\
@@ -164,6 +180,53 @@
                 \end{enumerate}
 
     \section{In-depth Module Analysis}
-        
+        One of the principles driving software development is \textit{modularity}. We have then tried to make our code components as independent as possible whilst allowing them to cooperate so that they can be used for other purposes besides the ones that we originally intended.\\
+
+        The development effort culminated on $3$ different modules fulfilling each a set of tasks:
+
+        \begin{enumerate}
+            \item \textbf{\texttt{virt\_net}:} This module is concerned with the instantiation of the different network elements (\texttt{veths}, \texttt{bridges} and \texttt{nodes}) together with their addressing and configuration. The module contains classes representing everything from the entire network to a single \texttt{veth}.
+            \item \textbf{\texttt{graph\_interpreter}:} This module acts as an intermediary translating the graphs provided by users to instances of the different classes defined in the \texttt{virt\_net} module. It will also implement the high-level functionality provided by user commands such as \texttt{mvsubn} and \texttt{mvnode}. On top of that, it will leverage \texttt{networkx}'s functionality to route the entire network and instantiate said routes in the routers once they have been brought up.
+            \item \textbf{\texttt{net\_ctrl}:} This module implements the \texttt{CLI} users running the tool will be presented with. It will resolve issued commands to calls to functions defined in the \texttt{graph\_interpreter} module. This module serves as the user's entry point to the functionality offered by our tool.
+        \end{enumerate}
+
+        The design we have just specified allows other users to ``swap'' the modules they do not desire to use for their own or third-party ones. One can, for instance, decide not to use our \texttt{graph\_interpreter} and manually instantiate a network through calls to the \texttt{virt\_net} module alone and that would be completely feasible. We will now include the documentation for each of the modules down to the \textit{function-level}.\\
+
+        \subsection{Conventions}
+            \subsubsection{Data Type Specifications}
+                The \texttt{C programming language} is by no means user friendly. Nonetheless, there is one aspect we really missed when developing in \texttt{python}: data type specification. In an effort to make the understanding of our code easier we have decided to specified each attribute's and variable's data types in the documentation composing this section. The syntax we will use to describe the used types is:\\
+
+                \begin{itemize}
+                    \item \textbf{\texttt{Strings}:} \texttt{string}.
+                    \item \textbf{\texttt{Lists}:} \texttt{list/value\_type}.
+                    \item \textbf{\texttt{Dictionaries}:} \texttt{dictionary/key\_type/value\_type}.
+                    \item \textbf{\texttt{Boolean}:} \texttt{boolean}.
+                    \item \textbf{\texttt{Instance of class Foo}:} \texttt{Foo\_inst}.
+                \end{itemize}
+
+            \subsubsection{Defining Private Methods}
+                One of the main advantages of the object-oriented programming is that it provides ``access control'' to methods and attributes of a class. In \texttt{C++}, this is accomplished by classifying them as \texttt{private} or \texttt{public}, for instance. On the other hand \texttt{python} does not \textit{enforce} this behaviour: a user will be able to call any method or access any attribute of an instance.\\
+
+                In order to ``circumvent'' this issue, the convention has it that method and attribute names prepended by an underscore (\texttt{\_}) are to be treated as private. If a user decides to explicitly call or access these methods and attributes he or she is then exposed to undefined behaviours.\\
+
+            \subsubsection{Calling Methods Through the Module Name}
+                We have chosen to always call functions and instantiate classes external to the current file through their full name (i.e. including the name of the external file in the call). This does increase the length of code lines but it allows the reader (and ourselves) to know where the functions and classes are effectively defined. We feel like the increase in line length is completely justified.\\
+
+            \subsubsection{The \texttt{\_\_init\_\_.py} File}
+                Each of our modules contains an empty \texttt{\_\_init\_\_.py} file so that they become \texttt{regular packages}. This allows us to comfortably import the modules where their contents are needed. More information on \texttt{python}'s import system can be found \href{https://docs.python.org/3/reference/import.html#regular-packages}{here}.
+
+        \subsection{The \texttt{virt\_net} Module}
+            \subsubsection{\texttt{Constants.py}}
+                In an effort to reduce the number of dependencies we decided to leverage \href{https://en.wikipedia.org/wiki/ANSI_escape_code}{\texttt{ANSI Escape Codes}} to colorize the different output messages. This module then defines the different \texttt{strings} controlling the colours.
+
+                \paragraph{Imported Libraries}
+                    None as there are no external dependencies.
+
+                \paragraph{Global Variables}
+                    \begin{enumerate}
+                        \item \textbf{\texttt{terminal\_escape\_sequences (dictionary/string/string)}:} \texttt{Dictionary} keyed by color names whose associated values are \texttt{ANSI Escape Sequences} changing the terminal's output color to the one specified. This solution is \textbf{not} to be considered portable. It \textbf{should} nonetheless work on any regular terminals supporting colors. We can assure it works with the following terminal emulators: \texttt{tilix}, \texttt{kitty} and \texttt{Visual Studio Code's Embedded Terminal Emulator}.
+                    \end{enumerate}
+
+            \subsubsection{\texttt{Interface.py}}
 
     \section{Working Topologies}
