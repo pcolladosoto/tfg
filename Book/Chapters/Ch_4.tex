@@ -243,6 +243,27 @@
                 \end{enumerate}
 
                 \paragraph{Imported Libraries}
-                    % NOTE: You can use \subparagraph{} too!
+                    \begin{enumerate}
+                        \item \textbf{\texttt{os}:} This module enables the execution of commands through a \texttt{sh} shell through the \texttt{os.system()} method. One can check the shell being spawned is indeed \texttt{sh} by running \texttt{\allowbreak os.system("echo \$0")} or bu querying the following \href{https://linux.die.net/man/3/system}{\texttt{manpage}}.
+                        \item \textbf{\texttt{constants}:} Grant access to the \texttt{\allowbreak terminal\_escape\_sequences dictionary} containing \texttt{ANSI escape sequences} enabling colored output.
+                    \end{enumerate}
 
+                \paragraph{Global Variables}
+                    \begin{enumerate}
+                        \item \textbf{\texttt{\allowbreak t\_colors - dictionary/string/string}:} This is a synonym for the \texttt{\allowbreak terminal\_escape\_sequences dictionary} we me mentioned before. It is used within calls to \texttt{print()} so that we can alter the terminal text's color allowing for a more visual information representation.
+                    \end{enumerate}
+
+                \paragraph{The \texttt{interface class}}
+                    This class represents a host's interface.
+
+                    \subparagraph{Class Attributes}
+                        \begin{enumerate}
+                            \item \textbf{\texttt{self.host\_name - string}:} Name identifying the host this interface belongs to.
+                            \item \textbf{\texttt{self.ip\_range - string}:} Interface's IP and subnetwork mask in \href{https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing}{CIRD} format. Ex: \texttt{"10.0.0.1/24"}.
+                            \item \textbf{\texttt{self.ip - string}:} Interface's IP address.
+                            \item \textbf{\texttt{self.if\_name - string}:} Interface's name. This is equivalent to traditional names like \texttt{enp2s0} or \texttt{wlp3s0} in Linux-based systems. In our case the names will follow a pattern given by \texttt{veth\_+\_-} where \texttt{+} and \texttt{-} are the names of the connected nodes. Note either \texttt{+} or \texttt{-} will be the same as \texttt{self.host\_name}. We would finally like to point out that \texttt{+} and \texttt{-} can be either upper or lowercase, depending on which is the first node to be attached to the links we create.
+                            \item \textbf{\texttt{self.subn\_gateway - string}:} IP address of this subnet's gateway, following the same format as \texttt{self.ip}.
+                            \item \textbf{\texttt{self.subn}:} Interface's subnetwork given as the network address for said subnetwork together with the subnet mask in \texttt{CIDR} notation. Ex: \texttt{10.0.0.0/24}.
+                            \item \textbf{\texttt{self.outbound\_interface}:} \texttt{True} if the interface's host is allowed to connect to external subnets. \texttt{False} otherwise. Due to how some ICS networks need to isolate some equipment, such as reactor's control systems, we need to know whether a given host is allowed to ``see'' the outside world. Having this information encoded into interfaces allows for a cleaner design when routing the network.
+                        \end{enumerate}
     \section{Working Topologies}
