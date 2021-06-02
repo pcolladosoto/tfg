@@ -228,5 +228,21 @@
                     \end{enumerate}
 
             \subsubsection{\texttt{Interface.py}}
+                This class will be in charge of providing a node's network functionality. An interface represents a connection with a computer network and thus is defined by a key parameter: the IP address. We should stress how an IP address is associated with an interface, \textbf{not} with the host itself. This subtlety will be extremely relevant when dealing with routers.\\
+
+                Another key aspect of interfaces is the role they play in network routes. Even though it is not entirely correct, in our case we can talk about the interface's routes. If we are being precise we would consider routes to be associated to a machine's network stack, not to a given interface. Nonetheless, as the graphs we are to instantiate will always define topologies in such a way that only an interface per host will belong to a given subnetwork we can indeed associate a route with an interface for a given route will only egress through a specific interface. This distinction will allow us to quickly and univocally query a node's route configuration.\\
+
+                Once an interface is configured it will just support a machine's connections. It is also crucial to note that even though an instance of the \texttt{interface} class is \textbf{not} the same thing as a \texttt{veth}, they are intimately related. Instantiating an \texttt{interface} will trigger the creation of a \texttt{veth} and deleting the former will also remove the latter. All in all, an interface's lifecycle can be described as:
+
+                \begin{enumerate}
+                    \item An interface instance is created and the associated \texttt{veth} is created as well.
+                    \item The interface is assigned an IP address.
+                    \item One or more routes are assigned to or deleted from the interface.
+                    \item The interface sits idle until it returns to $2$ or $3$ or goes to $5$.
+                    \item The interface is removed, which will also remove the corresponding \texttt{veth}.
+                \end{enumerate}
+
+                \paragraph{Imported Libraries}
+                    % NOTE: You can use \subparagraph{} too!
 
     \section{Working Topologies}
