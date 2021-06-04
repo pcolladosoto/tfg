@@ -239,7 +239,7 @@
 
                 Another key aspect of interfaces is the role they play in network routes. Even though it is not entirely correct, in our case we can talk about the interface's routes. If we are being precise we would consider routes to be associated to a machine's network stack, not to a given interface. Nonetheless, as the graphs we are to instantiate will always define topologies in such a way that only an interface per host will belong to a given subnetwork we can indeed associate a route with an interface for a given route will only egress through a specific interface. This distinction will allow us to quickly and univocally query a node's route configuration.\\
 
-                Once an interface is configured it will just support a machine's connections. It is also crucial to note that even though an instance of the \texttt{interface} class is \textbf{not} the same thing as a \texttt{veth}, they are intimately related. Instantiating an \texttt{interface} will trigger the creation of a \texttt{veth} and deleting the former will also remove the latter. All in all, an interface's lifecycle can be described as:
+                Once an interface is configured it will just support a machine's connections. It is also crucial to note that even though an instance of the \texttt{interface} class is \textbf{not} the same thing as a \texttt{veth}, they are intimately related. Instantiating an \texttt{interface} will trigger the creation of a \texttt{veth} and deleting the former will also remove the latter. All in all, an interface's lifecycle can be described as:\\
 
                 \begin{enumerate}
                     \item An interface instance is created and the associated \texttt{veth} is created as well.
@@ -414,5 +414,20 @@
                             \item \textbf{Returns:} Nothing.
                             \item \textbf{Description:} This method will just call \texttt{remove\_interface()}.
                         \end{enumerate}
+
+            \subsubsection{\texttt{Subnet\_Machines.py}}
+                This file contains the class definitions for the elements belonging to a subnetwork: \texttt{bridges} and \texttt{nodes}. We would like to clarify that we refer to regular \texttt{hosts} as \texttt{nodes} interchangeably.\\
+
+                We have purposefully decided \textbf{not to consider} \texttt{routers} as part of these subnetworks. The logic behind the decision is that a \texttt{router} belongs to at least two subnetworks in out topologies. Thus, defining its class in a file whose context is that of a single subnetwork did not seem appropriate.\\
+
+                Once again, we should point out how an instance of the \texttt{k\_bridge} class \textbf{is not} the same thing as the actual \texttt{bridge}, but they are intimately related. The following explains the lifecycle of both classes defined in this file.\\
+
+                \begin{enumerate}
+                    \item The real instance, either a \texttt{bridge} or a \texttt{host}, is brought up.
+                    \item The object representing said instance is created.
+                    \item The object sits idle. Several of its parameters can be altered within this state.
+                    \item At some point, the object will be dismantled.
+                    \item The release of the object will trigger the removal of the associated real instance.
+                \end{enumerate}
 
     \section{Working Topologies}
