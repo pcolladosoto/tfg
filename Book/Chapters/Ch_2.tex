@@ -2,7 +2,14 @@
     According to the discussion in the previous chapter we have settled on docker containers running Ubuntu for providing the backbone of our virtualized networks. This section is concerned with analyzing the different technologies that will play a role in supporting the virtual network infrastructures we are to create.\\
 
     \section{The Network Stack}
-        A fascinating but rather overwhelming image is \href{https://upload.wikimedia.org/wikipedia/commons/5/5b/Linux_kernel_map.png}{Linux's ``Map''}. If we pay close attention we will see how one of the columns is just devoted to networking. The software entities comprising this column is what we will refer to as \textit{Linux's Network Stack}\\
+        A fascinating but rather overwhelming image can be seen on figure \ref{fig:linux-map}. If we pay close attention we will see how one of its columns is just devoted to networking. The software entities comprising this column is what we will refer to as \textit{Linux's Network Stack}\\
+
+        \begin{figure}
+            \centering
+            \includegraphics[width=0.5\linewidth]{linux_map.png}
+            \caption{Linux's ``Map''. \href{https://upload.wikimedia.org/wikipedia/commons/5/5b/Linux_kernel_map.png}{Source}.}
+            \label{fig:linux-map}
+        \end{figure}
 
          The word stack is something that shows up time and time again in the area of networking. It helps us have a top-level view of how logical entities cooperate within a network. When we think about stacks we naturally begin to consider them in terms of the layers they are composed by, with each layer tackling a simple task and offering services to the layer above whilst using those provided by the layer below. It is not going to be any different with Linux; we can think of its network stack as a huge ``blob'' of code which all network packets reaching a Linux-based system traverse. Thus, if we can alter how Linux processes packets or build \textit{virtual} connections between different network stacks we would be capable of constructing a de-facto virtual network tailored to our needs.\\
 
