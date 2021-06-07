@@ -1,0 +1,4 @@
+\subsubsection{\texttt{Veth.py}}
+    When we began this project we decided to represent each \texttt{veth} as its own object. This approach proved to be quite cumbersome once we implemented the functionality allowing the user to modify the network topology. At that point we decided to define the \texttt{interface} class and implement the functionality connecting \texttt{veths} as a standalone function.\\
+
+    Like we mentioned before, we did not define a function altering the \texttt{veth}'s status (i.e. we will not disconnect them). When moving nodes around we will altogether delete and create \texttt{veth}s as needed. This greatly simplifies the code.
