@@ -117,7 +117,7 @@
             \subsubsection{Configuring Firewalls} \label{sec:fw-rules}
                 When configuring router \texttt{R-A-B} on listing \ref{lst:sample-topology-graph} we passed an empty \texttt{dictionary} \texttt{\{\}} to the \texttt{fw\_rules} parameter thus effectively disabling the firewall of said router.\\
 
-                In order to define appropriate rules, the user needs to provide a \texttt{dictionary} adhering to the syntax specification shown on listing \ref{lst:fw-dict-syntax}.\\
+                In order to define appropriate rules, the user needs to provide a \texttt{dictionary} adhering to the syntax specification shown on listing \ref{lst:fw-dict-syntax}. Note that the order in which these rules are specified is the order in which they will be instantiated. This \textbf{will not} affect our topologies, but it can have an impact on the logical connections supported on the virtual network infrastructures.\\
 
                 \begin{lstlisting}[language = python, caption = Syntax for specifying firewall rules., label = lst:fw-dict-syntax]
                     # Note '|' is to be read as 'OR'

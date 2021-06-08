@@ -141,3 +141,104 @@
                 \item \textbf{Returns:} A \texttt{boolean} indicating whether the operation completed successfully or not.
                 \item \textbf{Description:} If the caller does not specify a \texttt{subnet} parameter, this method erases all the interfaces associated with the router whilst also removing the associated ``real instances'' from the host machine. This can easily be accomplished through the \texttt{clear()} \footnote{\href{https://docs.python.org/3/tutorial/datastructures.html}{https://docs.python.org/3/tutorial/datastructures.html}} method defined for \texttt{lists}, such as the \texttt{self.interfaces} attribute due to the destructor we defined for the \texttt{interface} class. If the caller specifies a subnetwork, the method will look for the interface belonging to that subnetwork and \texttt{remove()} it from the \texttt{self.interfaces} attribute. This will, as before, trigger the deletion of the ``real interface''. The method will return \texttt{True} if either all the interfaces were deleted (i.e. no \texttt{subnet} was specified) or if the one specified through the \texttt{subnet} parameter was found and deleted as well. If the caller specified an interface belonging to a specific subnet and it was not found the method will return \texttt{False}, signaling an error.
             \end{enumerate}
+
+        \subparagraph{The \texttt{set\_fw\_rules()} Method}
+            \begin{enumerate}
+                \item \textbf{Parameters:}
+                \begin{enumerate}
+                    \item \texttt{self - d\_router\_inst:} The actual router instance.
+                    \item \texttt{fw\_rules - dictionary/list/string:} Firewall rules to be applied to the router.
+                \end{enumerate}
+                \item \textbf{Returns:} Nothing.
+                \item \textbf{Description:} This method will update the contents of the \texttt{self.fw\_rules} attribute that will serve as the cornerstone for the following methods.
+            \end{enumerate}
+
+        \subparagraph{The \texttt{apply\_fw\_rules()} Method}
+            \begin{enumerate}
+                \item \textbf{Parameters:}
+                \begin{enumerate}
+                    \item \texttt{self - d\_router\_inst:} The actual router instance.
+                \end{enumerate}
+                \item \textbf{Returns:} Nothing.
+                \item \textbf{Description:} This method will parse (i.e. process) the rules and policy contained in the \texttt{self.fw\_rules} attribute and then proceed on to make them effective. In order to do so, it relies on the \texttt{self.instantiate\_fw\_rule()} and \texttt{set\_fw\_policy()} methods we describe below. If said attribute is an empty \texttt{dictionary} the method will exit promptly and allow the router to forward all the traffic flowing through it, thus effectively disabling the firewall within the associated container. This method will only print a message when there are no rules configured, as the \texttt{self.instantiate\_fw\_rule()} method will print a message for each rule it processes.
+            \end{enumerate}
+
+        \subparagraph{The \texttt{instantiate\_fw\_rule()} Method}
+            \begin{enumerate}
+                \item \textbf{Parameters:}
+                \begin{enumerate}
+                    \item \texttt{self - d\_router\_inst:} The actual router instance.
+                    \item \texttt{target - string:} The \textit{target} for the rule, either \texttt{``ACCEPT''} or \texttt{``DROP''}.
+                    \item \texttt{source - string:} The source \textit{IP} address for the rule.
+                    \item \texttt{dest - string:} The destination \textit{IP} address for the rule.
+                    \item \texttt{bi\_dir - boolean:} \texttt{True} if the rule is ``bi-directional'' (i.e. an inverse rule should be instantiated). \texttt{False} otherwise.
+                \end{enumerate}
+                \item \textbf{Returns:} Nothing.
+                \item \textbf{Description:} This method leverages the \texttt{docker exec} command to instantiate the \textit{iptables} rules specified by its parameters on the associated container. The \texttt{bi\_dir} parameter will cause the instantiation of a symmetric rule (i.e. one that swaps the source and destination \textit{IP} addresses) as seen on section \ref{sec:fw-rules}. An informative message will be printed for each rule that is successfully added.
+            \end{enumerate}
+
+        \subparagraph{The \texttt{set\_fw\_policy()} Method}
+            \begin{enumerate}
+                \item \textbf{Parameters:}
+                \begin{enumerate}
+                    \item \texttt{self - d\_router\_inst:} The actual router instance.
+                    \item \texttt{policy - string:} The policy to apply to the router.
+                \end{enumerate}
+                \item \textbf{Returns:} Nothing.
+                \item \textbf{Description:} This method will apply the policy specified through the \texttt{policy} parameter to the router's \textit{FORWARDING} chain. \textit{iptables} is capable of handling both upper and lowercase policy specifications. This method relies on the \texttt{docker exec} command to configure the container associated to the instance whose method we are invoking. The method will also print a message if the operation succeeds.
+            \end{enumerate}
+
+        \subparagraph{The \texttt{add\_n\_apply\_fw\_rule()} Method}
+            \begin{enumerate}
+                \item \textbf{Parameters:}
+                \begin{enumerate}
+                    \item \texttt{self - d\_router\_inst:} The actual router instance.
+                    \item \texttt{trgt - string:} The \textit{target} for the rule, either \texttt{``ACCEPT''} or \texttt{``DROP''}.
+                    \item \texttt{src - string:} The source \textit{IP} address for the rule.
+                    \item \texttt{dst - string:} The destination \textit{IP} address for the rule.
+                    \item \texttt{b\_dir - boolean:} \texttt{True} if the rule is ``bi-directional'' (i.e. an inverse rule should be instantiated). \texttt{False} otherwise.
+                \end{enumerate}
+                \item \textbf{Returns:} Nothing.
+                \item \textbf{Description:} This method has been written to support ``dynamic firewalls''. As nodes are moved around the network the need for changes in firewall rules arises in order to maintain the exact same logical topology. This method will just add the rule specified through the parameters to the \texttt{self.fw\_rules} attribute and pass them to the \texttt{instantiate\_fw\_rule()} method to make them effective.
+            \end{enumerate}
+
+        \subparagraph{The \texttt{remove\_fw\_rule()} Method}
+            \begin{enumerate}
+                \item \textbf{Parameters:}
+                \begin{enumerate}
+                    \item \texttt{self - d\_router\_inst:} The actual router instance.
+                    \item \texttt{moving\_node\_ip - string:} The \textit{IP} address whose associated rules we are to delete.
+                \end{enumerate}
+                \item \textbf{Returns:} Nothing.
+                \item \textbf{Description:} This method has been written to support ``dynamic firewalls'' as well. On top of adding new rules upon a node's movement we also need to delete stale ones so that firewall configurations do not become cluttered over time. Given we are reusing freed \textit{IP} addresses, leaving unused rules behind could have unintended side effects that would be difficult to debug. This method will iterate over a router's firewall rules through the \texttt{self.fw\_rules} attribute and delete those whose source or destination \textit{IP} is the one specified by the \texttt{moving\_node} parameter. The reason behind the definition of this method is what justifies the chosen parameter name. This method relies on the \texttt{docker exec} command and it will also print an informative message upon rule deletion so that we can be sure every task was carried out successfully.
+            \end{enumerate}
+
+        \subparagraph{The \texttt{stop()} Method}
+            \begin{enumerate}
+                \item \textbf{Parameters:}
+                \begin{enumerate}
+                    \item \texttt{self - d\_router\_inst:} The actual router instance.
+                \end{enumerate}
+                \item \textbf{Returns:} A \texttt{boolean} indicating whether the operation succeeded or not.
+                \item \textbf{Description:} This method is in charge of stopping the instance's associated docker container. We can do so thanks to the \texttt{docker stop} command. This method leverages a redirection to \texttt{/dev/null} so that the output generated by \texttt{docker stop} does not interfere with our own. This method will print a message both upon success and error.
+            \end{enumerate}
+
+        \subparagraph{The \texttt{remove()} Method}
+            \begin{enumerate}
+                \item \textbf{Parameters:}
+                \begin{enumerate}
+                    \item \texttt{self - d\_router\_inst:} The actual router instance.
+                \end{enumerate}
+                \item \textbf{Returns:} Nothing.
+                \item \textbf{Description:} This method is in charge of entirely removing the associated container. It will call the \texttt{stop()} method as a container must be stopped before it can be removed through the \texttt{docker rm} command. First of all, the method will get rid of the interfaces as soon as possible so that, even if something goes wrong when deleting the container, it has no connection to a network that might still be alive. This will in fact isolate the container so that possible errors have no impact on the rest of the virtualized scenario. We will also delete the link to the container's network namespace living under \texttt{/var/run/netns}. As usual we will print information relative to the command's outcome.
+            \end{enumerate}
+
+        \subparagraph{The \texttt{Destructor}}
+            \begin{enumerate}
+                \item \textbf{Parameters:}
+                \begin{enumerate}
+                    \item \texttt{self - d\_router\_inst:} The actual router instance.
+                \end{enumerate}
+                \item \textbf{Returns:} Nothing.
+                \item \textbf{Description:} This method will call the \texttt{remove()} which will in turn delete the associated container. Given the definition of the \texttt{remove()} method this will later allow us to dismantle the entire network with a single order.
+            \end{enumerate}
