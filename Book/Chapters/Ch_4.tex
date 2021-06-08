@@ -55,7 +55,7 @@
                 sample_net.add_edge('subnet-b-brd', 'r-a-b')
             \end{lstlisting}
 
-            \subsubsection{Creating Well-formed Graphs}
+            \subsubsection{Creating Well-formed Graphs} \label{sec:good-graphs}
                 Our tool expects the nodes on a \texttt{networkx} graph to adhere to certain constraints so that it can assemble the requested topology. Given the bi-directional nature of network links (data is sent in both directions), we have decided to model our networks as \textbf{undirected graphs}. Then, these will always be composed by a set of \texttt{nodes} interconnected by a set of \texttt{edges}. The types of nodes one can use are listed on table \ref{tab:node-types}.\\
 
                 \begin{table}
@@ -229,5 +229,6 @@
             \input{API_doc/Subnet.tex}
             \input{API_doc/Veth.tex}
             \input{API_doc/Net_machines.tex}
+            \input{API_doc/Net.tex}
 
     \section{Working Topologies}
