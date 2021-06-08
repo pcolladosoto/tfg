@@ -115,9 +115,8 @@
 
         \subparagraph{Class Attributes}
             \begin{enumerate}
-                \item \textbf{\texttt{self.type - string}:} Object type identifier containing the \texttt{"node" string} for bridges. It is used within functions to check the type of object it is currently dealing with.
+                \item \textbf{\texttt{self.type - string}:} Object type identifier containing the \texttt{"node" string} for nodes. It is used within functions to check the type of object it is currently dealing with.
                 \item \textbf{\texttt{self.name - string}:} Node's name.
-                \item \textbf{\texttt{self.up - boolean}:} \texttt{True} if the bridge is currently up (i.e. ``switched on''). \texttt{False} otherwise.
                 \item \textbf{\texttt{self.pid - int}:} The associated container's \texttt{PID}. It is used when linking the container's network namespace to \texttt{/var/run/netns} so that we can easily access it afterwards.
                 \item \textbf{\texttt{self.interfaces - list/interface\_inst}:}  A list containing the instances of the interfaces belonging to this node.
             \end{enumerate}
@@ -130,7 +129,7 @@
                     \item \texttt{name - string:} The node's name.
                 \end{enumerate}
                 \item \textbf{Returns:} Nothing.
-                \item \textbf{Description:} This method will just initialize several members with the passed parameters whilst assigning sane defaults to others. It leverages the power of the \texttt{docker inspect} command to find the associated container's \texttt{PID}. It will also call \texttt{\_link\_net\_namespace()} to allow an easier handling of the container's namespace through the \texttt{ip} command.
+                \item \textbf{Description:} This method will just initialize several members with the passed parameters whilst assigning sane defaults to others. It leverages the power of the \texttt{docker inspect} command to find the associated container's \texttt{PID}. It will also call \texttt{\_link\_net\_namespace()} to allow an easier handling of the container's namespace through the \texttt{ip} command. It finally calls \texttt{\_set\_hostname()} to configure the node's identity from the network's perspective.
             \end{enumerate}
 
         \subparagraph{The \texttt{\_link\_net\_namespace()} Method}
@@ -180,7 +179,7 @@
                     \item \texttt{self - d\_node\_inst:} The actual node instance.
                 \end{enumerate}
                 \item \textbf{Returns:} A \texttt{list/string} containing the different subnetworks this node is connected to in \texttt{CIDR} format.
-                \item \textbf{Description:} This method will iterate over the \texttt{interface\_inst} contained in the \texttt{self.interfaces} attribute to then provide a list containing the subnetworks each of these \texttt{interface\_inst} belong to.
+                \item \textbf{Description:} This method will iterate over the \texttt{interface\_inst} contained in the \texttt{self.interfaces} attribute to then provide a list containing the subnetworks each of these \texttt{interface\_inst} belong to. Even though nodes will usually belong to a single subnetwork this method allows for a more extensible design that can accommodate for nodes belonging to different subnetworks in more complex topologies.
             \end{enumerate}
 
         \subparagraph{The \texttt{get\_interface()} Method}
@@ -219,7 +218,7 @@
                     \item \texttt{self - d\_node\_inst:} The actual node instance.
                 \end{enumerate}
                 \item \textbf{Returns:} Nothing.
-                \item \textbf{Description:} This method erases all the interfaces associated with the node through the \texttt{clear()} \footnote{\href{https://docs.python.org/3/tutorial/datastructures.html}{https://docs.python.org/3/tutorial/datastructures.html}} method of the \texttt{self.interfaces list}. This method will \textit{implicitly} call the destrucotr for each interface, thus effectively deleting the underlying \texttt{veths}.
+                \item \textbf{Description:} This method erases all the interfaces associated with the node through the \texttt{clear()} \footnote{\href{https://docs.python.org/3/tutorial/datastructures.html}{https://docs.python.org/3/tutorial/datastructures.html}} method of the \texttt{self.interfaces list}. This method will \textit{implicitly} call the destructor for each interface, thus effectively deleting the underlying \texttt{veths}.
             \end{enumerate}
 
         \subparagraph{The \texttt{stop()} Method}
