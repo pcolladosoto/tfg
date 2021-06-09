@@ -223,13 +223,21 @@
                 These methods will be defined for each of our classes and, given the \texttt{\_\_init\_\_()} and \texttt{\_\_del\_\_()} names can come across as rather cryptic we have decided to denote them as \texttt{constructor} and \texttt{destructor}, respectively, in the following sections.\\
 
         \subsection{The \texttt{virt\_net} Module}
-            \input{API_doc/Constants.tex}
-            \input{API_doc/Interface.tex}
-            \input{API_doc/Subnet_machines.tex}
-            \input{API_doc/Subnet.tex}
-            \input{API_doc/Veth.tex}
-            \input{API_doc/Net_machines.tex}
-            \input{API_doc/Net.tex}
-            \input{API_doc/Address_manager.tex}
+            \input{Code_doc/Constants.tex}
+            \input{Code_doc/Interface.tex}
+            \input{Code_doc/Subnet_machines.tex}
+            \input{Code_doc/Subnet.tex}
+            \input{Code_doc/Veth.tex}
+            \input{Code_doc/Net_machines.tex}
+            \input{Code_doc/Net.tex}
+            \input{Code_doc/Address_manager.tex}
+
+        \subsection{The \texttt{graph\_interpreter} Module}
+            This module is concerned with interpreting a graph and translating its structure to calls to methods defined in the previous module. In order to accomplish this, we have had to implement the ``thickest'' methods which are in charge of routing the network, dealing with the movement of nodes and subnetworks and parsing the initial graph. As we stated before, the use of this module is not mandatory: one can perform ``raw calls'' to the \texttt{virt\_net} module and manually handle the routing within the generated network. This would also imply features like moving nodes once the network is operational would be lost. Even though this module's purpose is not complex, the implementation of several features proved to be rather challenging.\\
+
+            \paragraph{Leveraging \textit{NetworkX}}
+                We strongly believe it is better to stress one's work flaws than its strong aspects. In an effort to ease the development process whilst enhancing the outcome's resiliency we settled on leveraging the \textit{NetworkX} module.As we have previously hinted, \textit{NetworkX's} main purpose is handling graphs. By modeling our networks as undirected graphs we can leverage already implemented functionalities such as checking whether the graph is completely connected (i.e. there are no dangling nodes) or even routing algorithms. Given we have a complete view of the network we decided to apply \textit{Dijkstra's Algorithm} \footnote{https://en.wikipedia.org/wiki/Dijkstra\%27s_algorithm}. \textit{NetworkX} offers several methods through which we can obtain the shortest path between any two nodes. Combining this information with the complete list of network nodes allows us to completely route the network in an elegant way. We would like to point out once again how we manually implemented our solution to this issue through our own routing algorithm. Nevertheless, we discarded it in favour of \textit{Dijkstra's Algorithm} when we settled on relying on \textit{NetworkX}.
+
+            \input{Code_doc/Graph_interpreter.tex}
 
     \section{Working Topologies}
