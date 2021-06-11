@@ -1,4 +1,50 @@
 \chapter{Proof of Concept}
     \section{Description}
+        The main goal of this project is serving as a benchmark tool for research purposes. In order to demonstrate this is a feasible use of our work we have prepared a proof of concept in which we simulate an attack and monitor the network's state.\\
+
+        The initial scenario is composed by a set of nodes running a \textit{ping} process against themselves (i.e. against \textit{IP} \texttt{127.0.0.1}). We then define the \textit{Quality of Service (QoS)} of the network through the function shown on equation \ref{eq:net-qos}. Function $pings(t)$ represents the number of currently active \textit{ping} processes in the network. Thus $pings(0) = Maximum\ Number\ of\ Ping\ Processes$; in other words, our initial scenario is offering the best possible \textit{QoS} (i.e. $QoS(0) = 1$).\\
+
+        The attack we have written manifests itself as a ``virus'' that will replicate throughout the network. Whenever it reaches a machine, it will \textit{kill} its associated \textit{ping} process and then jump to another one. This implies that, as the attack progresses, we will experience how $pings(t)$ decreases as $t$ increases. This amounts to $QoS(t)$ diminishing with time as well. By scrutinising the plots of $QoS( t )$ we will try to judge how much of an impact altering the network's topology has on the attacks progression.\\
+
+        {
+            \renewcommand\figurename{Equation}
+            % \renewcommand\thefigure{5.1}
+            \begin{figure}
+                \[QoS(t) = \frac{pings(t)}{pings(0)};\ Qos(t) \in [0,\ 1]\ \forall\ t \in [0, \infty)\]
+                \caption{Definition of the network's \textit{QoS}}
+                \label{eq:net-qos}
+            \end{figure}
+        }
+
+        \subsubsection{The Exploit}
+            Like many attacks, our own leverages a vulnerability in the network elements' configuration. The reader might recall the \textit{Dockerfile} we presented on listing \ref{lst:router-dockerfile} in which we set \textit{1234} as \textit{root's} password. Our ``virus'' assumes the password is already known, which implies it is capable of accessing every machine of the network. Note that, even though we have not included it explicitly, the \textit{Dockerfile} defining the images run by nodes also configure \textit{1234} as \textit{root's} password.\\
+
+            It is true that this assumption can be considered as giving an unfair advantage to a potential attacker. However, we are interested in mitigating an attack once it occurs, not in preventing it. Thus, answering how an attacker gains a foothold in the network is not as interesting to us: we want to discover how we can minimize the attack's impact.\\
+
+        \subsubsection{Attack Dependencies}
+            The attack itself requires the \textit{ssh} daemon and associated tools such as \textit{scp} as well as on standard utilities like \textit{ping}. However, these are also required for the container's correct operation, so we are not considering them strict attack dependencies. On the other hand, we depend on the \textit{sshpass} binary to carry out the attack in an automatic fashion.\\
+
+            Programs such as \textit{ssh} will only read input such as passwords from their \textit{controlling terminal} (i.e. the file descriptor returned by \texttt{open("/dev/tty")}) rather than from \textit{STDIN} itself. This renders shell redirections such as \texttt{echo "1234" | ssh 10.0.1.3} unusable. This ``limitation'' can be circumvented by programs such as \textit{sshpass}. This binary will \texttt{fork()} a process and run \textit{sshpass} within it. However, before doing so it will consider the parent process (i.e. \textit{sshpass} itself) as the child's controlling terminal. This allows \textit{sshpass} to ``feed'' the password to \textit{ssh} in a totally automated way.\\
+
+            We quoted the term ``limitation'' because the design of the \textit{ssh} tool and its associated utilities is not design to be frustrating. When passing passwords on the command line, these can be ``seen'' on the output of programs such as \textit{ps}, which exposes credentials that should always remain private. Thus, when we invoke \textit{sshpass} we are letting other users logged into the system know our \textit{1234} password. Nonetheless, this is an attack: we are not concerned with security. That is why we believe the use of tools such as \textit{sshpass} is justified.\\
+
+            The \textit{sshpass} binary was compiled on our own host from its sources \footnote{https://sourceforge.net/projects/sshpass/files/sshpass/1.08/} in a \textit{static} fashion. This produces a larger output, but the resulting executable does not depend on any shared libraries. Given how slim container images are, we preferred to make sure no errors provoked by missing libraries could take place.\\
+
+        \subsubsection{The Attack Script}
+            Listing \ref{lst:atk-code} contains the \textit{bash} script implementing the attack on the network. Given \textit{bash} can be a harsh language we have littered the code with comments clarifying some of the most convoluted lines and obscure assumptions that might not be at all clear by just reading through the code.
+
+            \lstinputlisting[language = bash, caption = The Attack's Script., label = lst:atk-code]{Code_snippets/p_stopper.sh}
+
     \section{Running the Proof of Concept}
+        As a prerequisite to run the proof of concept the user needs to bring up the network the attack will be run on as explained on section \ref{sec:graph-exec}. Once this has been accomplished the following must be done in order:
+
+        \begin{enumerate}
+            \item Execute the \texttt{launch-pings} command on the \textit{CLI} that is offered after the network has been instantiated. This will run \texttt{docker -d exec <container-name> ping 127.0.0.1} against each node so that we can assure the $pings(0) = Maximum\ Number\ of\ Ping\ Processes$ condition is met. Note the \texttt{-d} option launches the command in the background (i.e. as a \textit{daemon}).
+            \item Copy the attack script together with the \textit{sshpass} binary to the node the start will start from. This can be achieved by running \texttt{docker cp p\_stopper.sh <initial-container>:/} and \texttt{docker cp sshpass <initial-container>:/}. Note these files \textbf{must be} executable. The user should run \texttt{chmod +x <filename>} on both of them either before or after copying them to the container. In the latter case the same effect can be achieved by running \texttt{docker exec <initial-container> chmod +x <filename>}.
+            \item If the initially infected node \textbf{is not} a router, the script relies on am empty file named \texttt{entrypoint} that must be present. It can be generated by means of the \texttt{docker exec <initial-container> touch /entrypoint}.
+            \item The attack script must be run, either from a \textit{bash} shell opened through \texttt{docker exec -it <initial-container> bash} by executing \texttt{./p\_sto pper.sh} or directly through \texttt{docker exec <initial-node> p\_stopper .sh}.
+            \item The attack takes a non-negligible amount of time to finish. After it is done it will return control of the shell the attack was started from back to the user.
+        \end{enumerate}
+
     \section{Results}
+        To be written...
