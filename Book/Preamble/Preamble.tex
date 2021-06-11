@@ -9,12 +9,9 @@
 % Make the References section show up in the table of contents
 \usepackage[nottoc, numbib]{tocbibind}
 
-% Let us cite the bibliography entries
-\usepackage{cite}
-
 % Time to add images
 \usepackage{graphicx}
-\graphicspath{{Img/}}
+\graphicspath{{Figs/}}
 
 % Links please!
 \usepackage{hyperref}
@@ -59,22 +56,9 @@
 
 \lstset{style = mystyle}
 
-% Use minted for code highlighting. Minted doc -> http://mirror.ox.ac.uk/sites/ctan.org/macros/latex/contrib/minted/minted.pdf
-\usepackage{minted}
-
-% Define new environments with settings and all. Use it with \begin{pycode}\end{pycode}
-\newminted{py}{
-    frame = lines,
-    style = emacs,
-    linenos
-}
-
-% Style input files. Use it with \pyfile{path/from/Book/directory/foo.py}
-\newmintedfile{py}{
-    frame = lines,
-    style = emacs,
-    linenos
-}
+% Bibliography Stuff. Check https://www.overleaf.com/learn/latex/Bibliography_management_in_LaTeX though!
+\usepackage[backend = bibtex, style = ieee]{biblatex}
+\addbibresource{bibliography.bib}
 
 % Modify the margins
 % \usepackage{geometry}

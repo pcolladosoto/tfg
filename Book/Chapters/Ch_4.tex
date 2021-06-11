@@ -246,3 +246,46 @@
             \input{Code_doc/Net_ctrl.tex}
 
     \section{Working Topologies} \label{sec:working-tops}
+        Developing a project such as this one can at times seem daunting during the initial steps. One finds him or herself writing a lot of code without being certain of whether it is correct or not. That is why we decided to test our work as soon as possible to verify everything was marching as intended. In order to do so we designed some simple topologies, each being more complex than the previous one. We tried to instantiate them and manually check that the connectivity between all the nodes was the desired one.\\
+
+        This section includes these test topologies together with the most complex one we have been capable of working with.\\
+
+        \subsection{Topology Alpha}
+            This was the first topology we tested. The most valuable piece of information we extracted from it was that we were able to communicate with nodes belonging to \textit{Subnet C} from \textit{Subnet B}. This proved that routing packets through a subnetwork was behaving as intended. This topology is included on figure \ref{fig:top-alpha}.\\
+
+            \begin{figure}
+                \centering
+                \includegraphics[width=0.75\linewidth]{topology_alpha.png}
+                \caption{The \textit{Alpha Topology}.}
+                \label{fig:top-alpha}
+            \end{figure}
+
+        \subsection{Topology Beta}
+            This second topology added another subnetwork to the previous to push our routing procedures a little further. It is shown on figure \ref{fig:top-beta}.\\
+
+            \begin{figure}
+                \centering
+                \includegraphics[width=0.75\linewidth]{topology_beta.png}
+                \caption{The \textit{Beta Topology}.}
+                \label{fig:top-beta}
+            \end{figure}
+
+        \subsection{Topology Gamma}
+            This third topology added yet another subnetwork to the previous one. After successfully instantiating this topology we felt confident our design was capable of handling significantly more complex topologies. It is shown on figure \ref{fig:top-gamma}.\\
+
+            \begin{figure}
+                \centering
+                \includegraphics[width=0.75\linewidth]{topology_gamma.png}
+                \caption{The \textit{Gamma Topology}.}
+                \label{fig:top-gamma}
+            \end{figure}
+
+        \subsection{Topology ICS}
+            This fourth topology is modeled after \textit{figure 4} of \cite{bib:ics-article}. It is the most complex one we have worked with and the one we have carried out or proof of concept on. We would like to note how, unless otherwise specified \textbf{all the firewalls drop packets}. That is, only hosts listed on the \textit{FW Conf} sections on figure \ref{fig:top-ics} are able to communicate. This topology is portrayed on figure \ref{fig:top-ics}.\\
+
+            \begin{figure}
+                \centering
+                \includegraphics[width=0.75\linewidth]{topology_ics.png}
+                \caption{The \textit{ICS (Industrial Control System) Topology}.}
+                \label{fig:top-ics}
+            \end{figure}
