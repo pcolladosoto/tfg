@@ -1,4 +1,4 @@
-\input{Preamble/Preamble.tex}
+\input{Preamble.tex}
 
 \begin{document}
     %
@@ -28,13 +28,13 @@
 
         % The brackets make definitions only be
             % in scope within them
-        % {
-        %     \renewcommand\clearpage{}
-        %     \tableofcontents
-        %     \lstlistoflistings
-        %     \listoftables
-        %     \listoffigures
-        % }
+        {
+            \renewcommand\clearpage{}
+            \tableofcontents
+            \lstlistoflistings
+            \listoftables
+            \listoffigures
+        }
 
         %%%%%%%%%%%%%%
         %% ABSTRACT %%
@@ -59,6 +59,10 @@
     \input{Chapters/Ch_5.tex}
     \input{Chapters/Ch_6.tex}
     % \input{Chapters/Appendix.tex}
+
+    % The following causes non-cited entries to appear in the
+        % bibliography.
+    % \nocite{*}
 
     \printbibliography[title = {Modify Me :P}]
 \end{document}
