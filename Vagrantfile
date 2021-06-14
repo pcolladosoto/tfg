@@ -8,6 +8,10 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu/focal64"
+  # Uncomment these to enable X11 forwarding. Remember
+    # to have XQuartz running on the host if on macOS!
+  # config.ssh.forward_agent = true
+  # config.ssh.forward_x11 = true
   config.vm.provider "virtualbox" do |v|
   # Let the host be reached from the outside!
   # config.vm.network "public_network"
