@@ -10,6 +10,9 @@
         %     \end{figure}
         % \end{titlingpage}
 
+    % Use roman numerals until we issue \mainmatter
+    \frontmatter
+
     % ACKs
         % TODO!
 
@@ -35,6 +38,11 @@
 
     % Document Body
         % One could also use \include{}: https://www.overleaf.com/learn/latex/Management_in_a_large_project
+
+        % Begin using normal numbering!
+        \mainmatter
+
+        % Include the chapters
         \input{Chapters/Ch_1.tex}
         \input{Chapters/Ch_2.tex}
         \input{Chapters/Ch_3.tex}
