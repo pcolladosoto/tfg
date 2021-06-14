@@ -1,13 +1,7 @@
 \input{Preamble.tex}
 
 \begin{document}
-    %
-        %%%%%%%%%%%
-        %% COVER %%
-        %%%%%%%%%%%
-
-        % TODO: Fix me up!
-
+    % Cover
         % \begin{titlingpage}
         %     \maketitle
         %     \begin{figure}[!htb]
@@ -16,53 +10,45 @@
         %     \end{figure}
         % \end{titlingpage}
 
-        %%%%%%%%%%
-        %% ACKs %%
-        %%%%%%%%%%
-
+    % ACKs
         % TODO!
 
-        %%%%%%%%%%%%%
-        %% INDICES %%
-        %%%%%%%%%%%%%
+    % Tables of Contents
+        % Control the distance between the ToC's titles
+            % and the entries. These control the ToCs as
+            % they appear in order below.
+        \setlength{\cftaftertoctitleskip}{0.25cm}
+        \setlength{\cftafterloftitleskip}{0.25cm}
+        \setlength{\cftafterlottitleskip}{0.25cm}
 
-        % The brackets make definitions only be
-            % in scope within them
-        {
-            \renewcommand\clearpage{}
-            \tableofcontents
-            \lstlistoflistings
-            \listoftables
-            \listoffigures
-        }
+        % Print the ToCs
+        \tableofcontents
+        \lstlistoflistings
+        \listoftables
+        \listoffigures
 
-        %%%%%%%%%%%%%%
-        %% ABSTRACT %%
-        %%%%%%%%%%%%%%
-
+    % Abstract
         % TODO!
 
-        %%%%%%%%%%%%%%%%%%%%%%%
-        %% EXTENDED ABSTRACT %%
-        %%%%%%%%%%%%%%%%%%%%%%%
-
+    % Extended Abstract
         % TODO!
 
-    % NOTE: You can use \include{} as well. Take a look at:
-    % https://www.overleaf.com/learn/latex/Management_in_a_large_project
-    % for info on them!
+    % Document Body
+        % One could also use \include{}: https://www.overleaf.com/learn/latex/Management_in_a_large_project
+        \input{Chapters/Ch_1.tex}
+        \input{Chapters/Ch_2.tex}
+        \input{Chapters/Ch_3.tex}
+        \input{Chapters/Ch_4.tex}
+        \input{Chapters/Ch_5.tex}
+        \input{Chapters/Ch_6.tex}
 
-    \input{Chapters/Ch_1.tex}
-    \input{Chapters/Ch_2.tex}
-    \input{Chapters/Ch_3.tex}
-    \input{Chapters/Ch_4.tex}
-    \input{Chapters/Ch_5.tex}
-    \input{Chapters/Ch_6.tex}
-    % \input{Chapters/Appendix.tex}
+    % Appendixes
+        % No kidding: https://dictionary.cambridge.org/dictionary/english/appendix)
+    \appendix
+    \input{Chapters/Appendix.tex}
 
-    % The following causes non-cited entries to appear in the
-        % bibliography.
-    % \nocite{*}
-
-    \printbibliography[title = {Modify Me :P}]
+    % Bibliography
+        % The following causes non-cited entries to be included
+        % \nocite{*}
+        \printbibliography[title = {Modify Me :P}]
 \end{document}

@@ -11,7 +11,7 @@ all: main clean
 dbg: main
 
 # We need to run it twice for the refs and stuff to be picked up!
-main: main.tex
+main: Main.tex
 	pdflatex $(FLAGS) -jobname $@ $<
 	bibtex main.aux
 	pdflatex $(FLAGS) -jobname $@ $<

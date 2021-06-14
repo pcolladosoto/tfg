@@ -7,7 +7,7 @@
         \begin{figure}
             \centering
             \includegraphics[width=0.5\linewidth]{linux_map.png}
-            \caption{Linux's ``Map''. \href{https://upload.wikimedia.org/wikipedia/commons/5/5b/Linux_kernel_map.png}{Source}.}
+            \caption[Linux Kernel Structure]{Linux's ``Map''. \cite{bib:linux-map}}
             \label{fig:linux-map}
         \end{figure}
 
@@ -16,7 +16,7 @@
          \paragraph{Naming Packets}
             Before we go on we need to shed some light on the naming we are going to use regarding the units of data exchanged through network links. Even though the term packet is tremendously generic we feel it is not a wrong one to turn to in our case. When we wire up several network nodes together we are looking for full connectivity, that is, connectivity at the application level. Thus, we are not really that interested on what layer the ``packet'' is at, we do not really care if the packet is a \texttt{segment}, \texttt{datagram} or \texttt{frame}. In the case a need for more specific naming arises, we will not hesitate to do so, but we prefer to keep the writing simple and avoid getting bogged down with technicalities whose benefit we feel is not that obvious.\\
 
-            A prime example of the above would be the use of the term \texttt{packet} instead of \texttt{link-layer frame} in the section's introduction. \texttt{Frame} is the correct term for referring to the data structure a \texttt{NIC} (Network Interface Card) hands to the kernel (albeit somewhat processed as the preamble and Frame Check Sequence of Ethernet frames are usually stripped from incoming frames by the \texttt{NIC} itself as seen \href{https://gitlab.com/wireshark/wireshark/-/wikis/Ethernet}{here}).\\
+            A prime example of the above would be the use of the term \texttt{packet} instead of \texttt{link-layer frame} in the section's introduction. \textit{Frame} is the correct term for referring to the data structure a \texttt{NIC} (Network Interface Card) hands to the kernel (albeit somewhat processed as the preamble and Frame Check Sequence of Ethernet frames are usually stripped from incoming frames by the \textit{NIC} itself as seen on \textit{WireShark's} documentation \cite{bib:wirehsark-eth-doc}).\\
 
         If we think about network stacks, we would probably believe we need to have one per machine. That is, every network-capable devices must have their own \textit{data-path} which packets are to traverse. What may not be so simple is thinking that a machine \textit{may} have more than one network stack. In order to get a firmer grasp on the implications of the above idea let us revisit the concept of a network interface.\\
 
@@ -39,7 +39,7 @@
 
         This concept of instantiation is actually quite powerful as it appears continuously in many areas of engineering. Now, we could say that Linux's network namespaces work in a similar fashion to classes. We can think of the network stack as the class and what we call \textit{network namespaces} as the objects.\\
 
-        As seen \href{https://en.wikipedia.org/wiki/Linux_namespaces}{here}, namespaces are not only seen when dealing with networking, they are a feature of the Linux kernel employed in many other areas. These namespaces let us partition kernel resources so that each process sees a resource that is only for it, it is not shared. When applied to networking, we can see how each network namespace represents an entire network stack. Then, if we set up several network namespaces (namespaces from now on as this is the only type of namespace we will deal with) we have effectively housed several network stacks within the same machine. We then need to look into how we can interconnect them.\\
+        As seen on \cite{bib:man-namespaces}, namespaces are not only seen when dealing with networking, they are a feature of the Linux kernel employed in many other areas. These namespaces let us partition kernel resources so that each process sees a resource that is only for it, it is not shared. When applied to networking, we can see how each network namespace represents an entire network stack. Then, if we set up several network namespaces (namespaces from now on as this is the only type of namespace we will deal with) we have effectively housed several network stacks within the same machine. We then need to look into how we can interconnect them.\\
 
         Our system will model a network-capable machine as a simple process with its very own network namespace. This sentence can be quite abstract. That is why we believe a more concrete example can help the reader grasp what we are trying to entail.\\
 

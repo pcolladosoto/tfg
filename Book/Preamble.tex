@@ -9,14 +9,18 @@
 % Make the References section show up in the table of contents
 \usepackage[nottoc, numbib]{tocbibind}
 
-% Time to add images
+% Style the ToCs. Package documentation at:
+    % http://mirrors.ibiblio.org/CTAN/macros/latex/contrib/tocloft/tocloft.pdf
+\usepackage{tocloft}
+
+% Adding figures...
 \usepackage{graphicx}
 \graphicspath{{Figs/}}
 
 % Links please!
 \usepackage{hyperref}
 
-% Format the links
+% Link formatting
 \hypersetup{
     pdfborder = {0 0 0},    % Remove the ugly border
     colorlinks = true,      % Let there be color
@@ -25,7 +29,8 @@
     urlcolor = cyan         % Color the web links. (cyan is fancy for blueish...)
 }
 
-% Code listings. Taken from: https://www.overleaf.com/learn/latex/Code_listing
+% Code listings
+    % See https://www.overleaf.com/learn/latex/Code_listing
 \usepackage{listings, lstautogobble}
 \usepackage{xcolor}
 
@@ -56,14 +61,15 @@
 
 \lstset{style = mystyle}
 
-% Bibliography Stuff. Check https://www.overleaf.com/learn/latex/Bibliography_management_in_LaTeX though!
+% Bibliography Stuff
+    % See https://www.overleaf.com/learn/latex/Bibliography_management_in_LaTeX though!
 \usepackage[backend = bibtex, style = ieee]{biblatex}
 \addbibresource{Bibliography/articles.bib}
 \addbibresource{Bibliography/figures.bib}
 \addbibresource{Bibliography/websites.bib}
 \addbibresource{Bibliography/manpages.bib}
 
-% Gantt diagram stuff
+% Gantt Diagrams
 \usepackage{pgfgantt}
 
 % Euro symbol
