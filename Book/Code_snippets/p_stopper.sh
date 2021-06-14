@@ -41,7 +41,7 @@ n_ips=${#iface_ips[@]}
     # utility that 'kills' processes by name. This
     # increased the number of needed dependencies however,
     # and we decided to do it ourselves.
-ping_pid=$(ps -ax | grep ping | head -n 1 | awk '{print $1}')
+ping_pid=$(pgrep ping)
 
 # If we found a ping process (i.e. 'ping_pid' variable is
     # not empty).
