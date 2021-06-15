@@ -1,0 +1,56 @@
+\chapter{Project Budget and Schedule}
+    \section{Project Schedule}
+        The \textit{Gantt Diagram} found on figure \ref{fig:gantt} summarizes the different periods the development process has traversed. We would like to point out that each week is assumed to last $20\ hours$, which brings the project's total duration up to $320\ hours$.
+        \begin{figure}
+            \centering
+            \begin{tikzpicture}
+                \begin{ganttchart}[
+                    hgrid,
+                    vgrid,
+                    % y unit chart=.73cm,
+                    bar/.append style={fill=cyan!50},
+                    % expand chart=\linewidth
+                ]{1}{16}
+                    \gantttitle{Weeks}{16}\\
+                    \gantttitlelist{1,...,16}{1}\\
+                    \ganttbar{Information Gathering}{1}{4}\\
+                    \ganttbar{Technology Assessment}{1}{4}\\
+                    \ganttbar{Planning}{5}{5}\\
+                    \ganttbar{Development Environment Setup}{5}{5}\\
+                    \ganttbar{Development}{5}{13}\\
+                    \ganttbar{Report Preparation}{13}{16}
+                \end{ganttchart}
+            \end{tikzpicture}
+            \caption{Project's Development Phases Over Time}
+            \label{fig:gantt}
+        \end{figure}
+
+    \section{Budget}
+        Like in any other profession, a developer needs a set of tools to carry out his or her work in an effective manner. These incur into expenses we are detailing in this section.
+
+        \subsection{Software Costs}
+            We have strived to use only cost-free software in our development. That is why we have incurred in \textbf{no} software related costs.
+
+        \subsection{Hardware Costs}
+            Given we are working with virtual infrastructure we only need to account for the cost of our workstation when it comes to budgeting. We have developed the project with the help of a \textit{MacBook Pro} computer sporting a \textit{4 Core Intel i5 CPU at 1,4 GHz} and a \textit{16 GB RAM}. Given we have found the machine's trackpad incredibly comfortable we have not had to acquire any external accessories such as a mouse or external keyboard. The computer's cost was $1200\ \text{\euro{}}$.
+
+        When accounting for fixed expenses such as the cost of electricity and internet access, and factoring in the regular salary for an undergrad engineer we obtain a complete budget as the one included on table \ref{tab:budget}.
+
+        \begin{table}
+            \centering
+            \begin{tabular}{|c|c|c|c|}
+                \hline
+                \textbf{Concept} & \textbf{Units} & \textbf{Unit Cost} & \textbf{Total Cost (VAT Included)}\\
+                \hline
+                Software & $0$ & $0\ \text{\euro{}}$ & $0\ \text{\euro{}}$\\
+                \hline
+                Hardware & $1$ & $1200\ \text{\euro{}}$ & $1200\ \text{\euro{}}$\\
+                \hline
+                Fixed Expenses per Week & $16$ & $20\ \text{\euro{}}$ & $320\ \text{\euro{}}$\\
+                \hline
+                Salary per hour & $320$ & $10\ \text{\euro{}}$ & $3200\ \text{\euro{}}$\\
+                \hline
+            \end{tabular}
+            \caption{Project's Budget}
+            \label{tab:budget}
+        \end{table}
