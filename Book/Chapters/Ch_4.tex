@@ -75,7 +75,7 @@
                     \label{tab:node-types}
                 \end{table}
 
-                When adding a new node one must make sure that the following constraints \textbf{are respected}. Otherwise, all sorts of undefined behavior can and will be experienced: anything from a network that cannot be started to the presence of routing loops can happen. Given the restrictions we are imposing, these will be \textit{bipartite graphs} \footnote{\label{ft:bigraphs}https://en.wikipedia.org/wiki/Bipartite\_graph}. Using the same notation as footnote \footnotemark[\value{footnote}], set $V$ would contain bridges whilst set $U$ would contain both nodes and routers. This property \textbf{has not} been leveraged in our code, but it could prove to be useful if this work is developed further.\\
+                When adding a new node one must make sure that the following constraints \textbf{are respected}. Otherwise, all sorts of undefined behavior can and will be experienced: anything from a network that cannot be started to the presence of routing loops can happen. Given the restrictions we are imposing, these will be \textit{bipartite graphs} \cite{bib:bipartite-graphs}, set $V$ would contain bridges whilst set $U$ would contain both nodes and routers. This property \textbf{has not} been leveraged in our code, but it could prove to be useful if this work is developed further.\\
 
                 \begin{enumerate}
                     \item \textbf{Rules regarding node definitions:}

@@ -70,7 +70,6 @@
                 \item \textbf{Description:} Not applicable.
             \end{enumerate}
 
-        % TODO: Cite https://docs.python.org/3/library/functions.html!
         \subparagraph{The \texttt{req\_brd\_name()} Method}
             \begin{enumerate}
                 \item \textbf{Parameters:}
@@ -78,10 +77,9 @@
                     \item \texttt{self - d\_net\_inst:} The actual network instance.
                 \end{enumerate}
                 \item \textbf{Returns:} A \texttt{string} containing the name to be given to a bridge that needs to be automatically created.
-                \item \textbf{Description:} This method might be needed when moving entire subnetworks within the virtual network. This method will also update the \texttt{self.router\_bridge} attribute to gracefully handle a subsequent calls. In order to modify new names we leverage \textit{python's} \texttt{ord()} and \texttt{chr()} functions. The generated names will follow the \texttt{``z-rb'', ``y-rb'', ..., ``a-rb''} progression. The current method definition only allows for $26$ different names. This limitation has not manifested yet but we should nonetheless note it exists.
+                \item \textbf{Description:} This method might be needed when moving entire subnetworks within the virtual network. This method will also update the \texttt{self.router\_bridge} attribute to gracefully handle a subsequent calls. In order to modify new names we leverage \textit{python's} \texttt{ord()} \cite{bib:python-builtins} and \texttt{chr()} \cite{bib:python-builtins} functions. The generated names will follow the \texttt{``z-rb'', ``y-rb'', ..., ``a-rb''} progression. The current method definition only allows for $26$ different names. This limitation has not manifested yet but we should nonetheless note it exists.
             \end{enumerate}
 
-        % TODO: Cite https://docs.python.org/3/library/functions.html!
         \subparagraph{The \texttt{req\_r\_name()} Method}
             \begin{enumerate}
                 \item \textbf{Parameters:}
@@ -89,7 +87,7 @@
                     \item \texttt{self - d\_net\_inst:} The actual network instance.
                 \end{enumerate}
                 \item \textbf{Returns:} A \texttt{string} containing the name to be given to a router that needs to be automatically created.
-                \item \textbf{Description:} This method might be needed when moving entire subnetworks within the virtual network. The method will also update the \texttt{self.aux\_router} attribute to gracefully handle a subsequent calls. In order to modify new names we leverage \textit{python's} \texttt{ord()} and \texttt{chr()} functions. The generated names will follow the \texttt{``ra-z'', ``ra-y'', ..., ``ra-a''} progression. The current method definition only allows for $26$ different names. This limitation has not manifested yet but we should nonetheless note it exists.
+                \item \textbf{Description:} This method might be needed when moving entire subnetworks within the virtual network. The method will also update the \texttt{self.aux\_router} attribute to gracefully handle a subsequent calls. In order to modify new names we leverage \textit{python's} \texttt{ord()} \cite{bib:python-builtins} and \texttt{chr()} \cite{bib:python-builtins} functions. The generated names will follow the \texttt{``ra-z'', ``ra-y'', ..., ``ra-a''} progression. The current method definition only allows for $26$ different names. This limitation has not manifested yet but we should nonetheless note it exists.
             \end{enumerate}
 
         \subparagraph{The \texttt{create\_subnet()} Method}
