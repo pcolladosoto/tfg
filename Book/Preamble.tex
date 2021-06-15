@@ -63,7 +63,9 @@
 
 % Bibliography Stuff
     % See https://www.overleaf.com/learn/latex/Bibliography_management_in_LaTeX though!
-\usepackage[backend = bibtex, style = ieee]{biblatex}
+    % Note the 'dashed = false' option prevents a repeated author's name to be replaced
+        % by dashes (----) when both references share a page.
+\usepackage[backend = bibtex, style = ieee, dashed = flase]{biblatex}
 \addbibresource{Bibliography/articles.bib}
 \addbibresource{Bibliography/figures.bib}
 \addbibresource{Bibliography/websites.bib}

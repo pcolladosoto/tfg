@@ -15,7 +15,7 @@
 
     \paragraph{Imported Libraries}
         \begin{enumerate}
-            \item \textbf{\texttt{os}:} This module enables the execution of commands through a \texttt{sh} shell through the \texttt{os.system()} method. One can check the shell being spawned is indeed \texttt{sh} by running \texttt{\allowbreak os.system("echo \$0")} or bu querying the following \href{https://linux.die.net/man/3/system}{\texttt{manpage}}.
+            \item \textbf{\texttt{os}:} This module enables the execution of commands through a \texttt{sh} shell through the \texttt{os.system()} method. One can check the shell being spawned is indeed \texttt{sh} by running \texttt{\allowbreak os.system("echo \$0")} or by querying \cite{bib:man-system}.
             \item \textbf{\texttt{constants}:} Grant access to the \texttt{\allowbreak terminal\_escape\_sequences dictionary} containing \texttt{ANSI escape sequences} enabling colored output.
         \end{enumerate}
 
@@ -30,7 +30,7 @@
         \subparagraph{Class Attributes}
             \begin{enumerate}
                 \item \textbf{\texttt{self.host\_name - string}:} Name identifying the host this interface belongs to.
-                \item \textbf{\texttt{self.ip\_range - string}:} Interface's IP and subnetwork mask in \href{https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing}{CIDR} format. Ex: \texttt{"10.0.0.1/24"}.
+                \item \textbf{\texttt{self.ip\_range - string}:} Interface's IP and subnetwork mask in \textit{CIDR} \cite{bib:cidr-notation} format. Ex: \texttt{"10.0.0.1/24"}.
                 \item \textbf{\texttt{self.ip - string}:} Interface's IP address.
                 \item \textbf{\texttt{self.if\_name - string}:} Interface's name. This is equivalent to traditional names like \texttt{enp2s0} or \texttt{wlp3s0} in Linux-based systems. In our case the names will follow a pattern given by \texttt{veth\_+\_-} where \texttt{+} and \texttt{-} are the names of the connected nodes. Note either \texttt{+} or \texttt{-} will be the same as \texttt{self.host\_name}. We would finally like to point out that \texttt{+} and \texttt{-} can be either upper or lowercase, depending on which is the first node to be attached to the links we create.
                 \item \textbf{\texttt{self.subn\_gateway - string}:} IP address of this subnet's gateway, following the same format as \texttt{self.ip}.

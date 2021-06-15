@@ -15,7 +15,7 @@
 
     \paragraph{Imported Libraries}
         \begin{enumerate}
-            \item \textbf{\texttt{os}:} This module enables the execution of commands through a \texttt{sh} shell through the \texttt{os.system()} method. One can check the shell being spawned is indeed \texttt{sh} by running \texttt{\allowbreak os.system("echo \$0")} or bu querying the following \href{https://linux.die.net/man/3/system}{\texttt{manpage}}.
+            \item \textbf{\texttt{os}:} This module enables the execution of commands through a \texttt{sh} shell through the \texttt{os.system()} method. One can check the shell being spawned is indeed \texttt{sh} by running \texttt{\allowbreak os.system("echo \$0")} or by querying \cite{bib:man-system}.
             \item \textbf{\texttt{constants}:} Grant access to the \texttt{\allowbreak terminal\_escape\_sequences dictionary} containing \texttt{ANSI escape sequences} enabling colored output.
             \item \textbf{\texttt{sys}:} This module allows us to print error messages to \texttt{STDERR} instead of \texttt{STDOUT} so that they can be easily redirected later on if needed with \texttt{2>/path/to/log}.
             \item \textbf{\texttt{subprocess}:} This module enables the execution of commands through a shell \textbf{and} allows the caller to retrieve the command's output to \texttt{STDOUT} on top of its return code. This will let us retrieve a container's associated \texttt{PID}.
@@ -218,7 +218,7 @@
                     \item \texttt{self - d\_node\_inst:} The actual node instance.
                 \end{enumerate}
                 \item \textbf{Returns:} Nothing.
-                \item \textbf{Description:} This method erases all the interfaces associated with the node through the \texttt{clear()} \footnote{\href{https://docs.python.org/3/tutorial/datastructures.html}{https://docs.python.org/3/tutorial/datastructures.html}} method of the \texttt{self.interfaces list}. This method will \textit{implicitly} call the destructor for each interface, thus effectively deleting the underlying \texttt{veths}.
+                \item \textbf{Description:} This method erases all the interfaces associated with the node through the \texttt{clear()} \cite{bib:python-datastructures} method of the \texttt{self.interfaces list}. This method will \textit{implicitly} call the destructor for each interface, thus effectively deleting the underlying \texttt{veths}.
             \end{enumerate}
 
         \subparagraph{The \texttt{stop()} Method}

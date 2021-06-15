@@ -5,7 +5,7 @@
 
    \paragraph{Imported Libraries}
         \begin{enumerate}
-            \item \textbf{\texttt{os}:} This module enables the execution of commands through a \texttt{sh} shell through the \texttt{os.system()} method. One can check the shell being spawned is indeed \texttt{sh} by running \texttt{\allowbreak os.system("echo \$0")} or by querying the following \href{https://linux.die.net/man/3/system}{\texttt{manpage}}.
+            \item \textbf{\texttt{os}:} This module enables the execution of commands through a \texttt{sh} shell through the \texttt{os.system()} method. One can check the shell being spawned is indeed \texttt{sh} by running \texttt{\allowbreak os.system("echo \$0")} or by querying \cite{bib:man-system}.
             \item \textbf{\texttt{networkx}:} This module provides several graph-related functionalities such as routing algorithms which are required by some of the methods.
             \item \textbf{\texttt{copy}:} This modules allows us to create independent copies of ``deep'' \texttt{dictionaries}. This provides independent instances with the same contents instead of a shallow copy whose values are references to the \textbf{same} variables. Given \textit{python} does not expose the \textit{C} \texttt{pointer} type this idea can be regarded as awkward, but in \textit{C's} terms we can state that this module will allow us to dereference all the \texttt{pointers} within the structures we are to copy so that the resulting variable contains references to a totally different memory region.
             \item \textbf{\texttt{net}:} This module provides access to the \texttt{d\_net} class, which acts as a gateway for accessing the facilities offered by the \texttt{virt\_net} module.
