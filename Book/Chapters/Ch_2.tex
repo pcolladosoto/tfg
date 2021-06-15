@@ -525,12 +525,12 @@
                     \item A stopped or created container can \texttt{removed}. This step is non-reversible: the container's data will be deleted with it.
                 \end{enumerate}
 
-                \begin{figure}
+                \begin{sidewaysfigure}
                     \centering
                     \includegraphics[width=\linewidth]{container_lifecycle.png}
                     \caption[Container Lifecycle]{Image portraying a \texttt{container}'s lifecycle. \cite{bib:container-lifecycle}}
                     \label{fig:container-lifecycle}
-                \end{figure}
+                \end{sidewaysfigure}
 
                 We feel it is extremely important to draw the reader's attention to entry \ref{it:proc-death} in the enumeration describing a container's lifecycle. The fact that the exit of a container's main process effectively stops it implies that we can indeed stop containers through means not depending on the \texttt{docker stop} command. Given we are running an \texttt{ssh} daemon within the containers, we can log in as \texttt{root} and then issue \texttt{kill 1} to effectively stop the container. After all, \texttt{docker stop} will send the \texttt{SIGTERM} signal to the process running within the container and, should it not behave appropriately, \texttt{SIGKILL} after a configurable delay. Even though this subtlety will not impact the use we make of the virtual environments we are to work with it is a crucial aspect to bear in minf to fully understand the lifecylce of containers.\\
 
