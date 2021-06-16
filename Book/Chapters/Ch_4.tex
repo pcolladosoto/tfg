@@ -1,4 +1,6 @@
 \chapter{Automating the Deployment of Virtual Networks} \label{chap:4}
+    \epigraph{One of my most productive days was throwing away 1,000 lines of code.}{\textit{Ken Thompson}}
+
     \section{High Level Overview}
         As seen in chapter \ref{chap:3}, bringing a virtual network up entails an organizational overhead that is not easily handled. That is why we have developed a complete software system capable of handling these intricacies in an automatic fashion. Then, a user need only provide a \texttt{graph} describing the desired topology and our project will be able to read, interpret and instantiate said network.\\
 
@@ -18,7 +20,7 @@
                 \item \textbf{\texttt{Docker Python SDK}:} We \textbf{have not} used the \texttt{docker python SDK} (\texttt{S}oftware \texttt{D}evelopment \texttt{K}it) in our project. We have decide to leverage \texttt{docker}'s \texttt{CLI} interface from our code through calls to \texttt{os.system()}. However, someone deciding to use our project as a basis for something else might feel more comfortable interacting with \texttt{docker} through a pure-\texttt{python} \texttt{API} (\texttt{A}pplication \texttt{P}rogramming \texttt{I}nterface). Changing our code to work in said fashion is a rather simple task should it have to be done.
             \end{enumerate}
 
-        \subsection{User Manual}
+        \subsection{User Manual} \label{sec:user-manual}
             Throughout the development of our tool we have tried to simplify the use of the project as much as possible. The end result is a user-side workflow that only requires them to import a single project module to which they \textbf{must} provide a \texttt{NetworkX graph}. After doing so, they will be presented with a simple \texttt{CLI} letting them modify the currently live virtual network.\\
 
             \paragraph{User Permissions}

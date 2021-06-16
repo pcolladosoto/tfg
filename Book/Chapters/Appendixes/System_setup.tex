@@ -1,5 +1,68 @@
 \chapter{System Setup}
+    One of the main aspects we sought when designing the project was making the installation procedure as simple as possible. The following sections describe how to install and configure all the necessary tools. We will assume the target system is running a \textit{Debian-based} distribution. If that is not the case, we encourage the reader to query his or her distribution's documentation to find out what package manager to use instead of \textit{apt}. Common examples are \textit{dnf} and \textit{pacman} for \textit{Fedora} and \textit{Arch-based} distributions, respectively. Some package names might slightly differ as well: beware.\\
+
     \section{Installing External Dependencies}
+        We will describe how one can check whether the necessary tools are present or not. After that, we include listing \ref{lst:dependency-installation}, which contains the necessary commands to install each of the components in case they are not already present. Note several of the commands contain a leading \textit{sudo} to signify they will require elevated privileges. This might however not be needed in case it is \textit{root} him or herself who is running these commands.\\
+
+        \subsection{iproute2}
+            This project \textbf{requires} a machine running the \textit{linux kernel}. Most modern linux distributions will ship with the \textit{iproute2} suite preinstalled, but if that is not the case it needs to be installed. In order to determine whether \textit{iproute2} is available one can run \texttt{which ip}. If the command's output is \textbf{not} empty, the necessary tools are present.\\
+
+        \subsection{Docker}
+            Once can run \texttt{docker --version} to determine whether it is present on the system or not. We are including the necessary commands to acquire it on listing \ref{lst:dependency-installation}, but we encourage the reader to visit \cite{bib:docker-install} as it contains a more comprehensive explanation on the process.\\
+
+        \subsection{PIP}
+            \textit{PIP} is \textit{python's} package manager. Running \texttt{\allowbreak python3 -m pip --version} aides in determining whether it is present on the system or not. If it is, a message containing information on \textit{PIP's} version will be printed.\\
+
+        \subsection{Python Modules}
+            Our tool depends on both the \textit{matplotlib} and \textit{networkx} modules. Once \textit{PIP} is installed on the system we can run \texttt{\allowbreak python3 -m pip list | grep <module-name>} to determine whether module \textit{<module-name>} is present on the system or not. If the previous command shows no output, the specified module is not present on the system. Note listing \ref{lst:dependency-installation} explicitly uses \textit{sudo} when installing these modules. We delve a little deeper into that fact in a later section.\\
+
+        \begin{lstlisting}[language = bash, caption = Commands for installing needed dependencies., label = lst:dependency-installation]
+            # If any packages are to be installed with apt,
+                # update the repositories.
+            sudo apt update
+
+            # Installing iproute2
+            sudo apt install iproute2
+
+            # Installing docker
+                # Auxiliary packages
+                sudo apt install \
+                    apt-transport-https \
+                    ca-certificates \
+                    curl \
+                    gnupg \
+                    lsb-release
+
+                # Obtaining Docker's repository GPG key
+                curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+                    | sudo gpg --dearmor -o \
+                    /usr/share/keyrings/docker-archive-keyring.gpg
+
+                # Adding Docker's repository to the system
+                echo \
+                    "deb [arch=amd64 signed-by=/usr/share/keyrings/ \
+                        docker-archive-keyring.gpg] https://download \
+                        .docker.com/linux/ubuntu $(lsb_release -cs) \
+                        stable" | sudo tee /etc/apt/sources.list.d/ \
+                        docker.list > /dev/null
+
+                # Updating the repositories
+                sudo apt update
+
+                # Installing docker itself
+                sudo apt install docker-ce docker-ce-cli containerd.io
+
+            # Installing PIP
+            sudo apt install python3-pip
+
+            # Installing python modules matplotlib and networkx
+                # Note the can be installed separately.
+            sudo python3 -m pip install matplotlib networkx
+        \end{lstlisting}
+
+    \section{A note on Capabilities}
+        On section \ref{sec:user-manual} we already introduced the term capability. As seen on \cite{bib:man-capabilities}, \textit{capabilities} allow for a finer control so as to what a process can and cannot do. What is more, a process spawned by a non-privileged user can take actions traditionally reserved for those started by a privileged user as long as it is granted the necessary capabilities. The reader might recall listing \ref{lst:running-nodes} in which we were explicitly assigning several capabilities to 
+
     \section{Acquiring the Project's Code}
         \subsection{Leveraging \texttt{git}}
             \subsubsection{Cloning the Repository}
