@@ -1,0 +1,42 @@
+\chapter{Closing Thoughts and Future Work}
+    This project has posed a huge challenge to us. Given we have had to implement it entirely from the ground up we have had to grapple with several different technologies. In the case of \textit{docker} we have had to push its conception a little bit further in an effort to achieve our purpose. This need implied we had to circumvent several existing limitations derived from the tool itself not being designed for the use we were making of it.\\
+
+    Aside from \textit{docker}, we have also had to get acquainted with the entire \textit{iproute2} suite. Up to now we had only used it to carry out small fixes on our own machines when the networking configuration broke down in some place or another. The situation now called for a deeper understanding of the entire tool collection as well as its interaction with other programs such as \textit{iptables}. All the necessary information is intimately related with the kernel itself, which makes it somewhat harsh and arid. Even though these characteristics do not work towards the documentation's readability we have personally found it to be hugely precise and helpful.\\
+
+    Once we felt comfortable with all the technologies we were to leverage, we began developing the tool itself to automate the deployment of virtual networks. This was the first project we tackled using \textit{python}, and we are ware of the fact that anybody else could have made a much better job, but we managed to produce a working version. Even though the entire development process can be summarized in a single sentence, it was part of the project that took the longest to complete.\\
+
+    One might argue that this project has not pushed the associated group's research in a particular direction, and it is true. Our work is aimed at generating a tool that can be used as an auxiliary resource for the group's ongoing work. It is meant to be used as a validation mechanism to aide in as many articles and experiments as it possibly can. We personally believe that, as engineers, we should not forget to turn our work into tangible products, at least as tangible as software can be. We hope this work contributed to that ideal.\\
+
+    In any case, we are tremendously thankful for having been given the opportunity to devote our time and effort to this project. As in any other case we have had our ups and downs, but if there is one thing we can be sure about is that we have learnt and became better engineers at every turn of the road.\\
+
+    \section{Future Work}
+        \subsection{Possible Improvements}
+            The proof of concept we presented on chapter \ref{chap:5} is only concerned with two different scenarios. In one of them the network will remain static whilst in the other we are actively altering the topology in an effort to mitigate the attack. Even though both experiments show clear differences we can still devise many other techniques to try and monitor the network's response to a threat. What is more, we could even apply some of the techniques discussed in \cite{bib:react} to discern how well they respond to the attack. Even though we only presented a couple of situations, we believe they strongly exhibit how the project can withstand much more demanding tests.\\
+
+            Trying to use this project for new techniques might call for some enhancements to the \textit{CLI} whose commands we discussed on section \ref{sec:cli-cmds}. Given how the tool has been designed, this component is fully independent from the rest, which implies future patches and or features should be easy to integrate. One of the main reasons behind this modularized design is facilitating future work on the tool.\\
+
+        \subsection{Use as a Teaching Resource}
+            We have a strong teaching tendency. Despite hurtful quotes like the one stating that ``he who is not good enough, teaches'' we sincerely believe teaching to be a necessary aspect of the academic life. What is more, we consider teaching to be an extremely potent engine for social change and, in these times of unrest, that fact becomes more apparent than ever. This feeling is what prompted the idea of repurposing this tool into a framework that could be leveraged as a resource in practical lessons involving the manipulation of network-aware machines and topologies.\\
+
+            We ourselves had a course in which we had to work with several \textit{virtual machines} within a given network to then configure routing protocols such as \textit{OSPF} \cite{bib:rfc2328} and analyze traffic on the different machines through tools such as \textit{WireShark} \cite{bib:wireshark}. Our tool could play the same role \textit{VMs} had in that scenario, and given the existence of tools such as \textit{tcpdump} \cite{bib:man-tcpdump}, the same kind of information could be easily extracted. On top of our tool being a more lightweight approach to generating arbitrary topologies it also offers just that: arbitrarily complex networks. From our experience working with virtual machines we can confirm that configuring the underlying network is close to impossible. What is more, they usually require an installation process and when transferring them around they manifest as large files in terms of storage. Table \ref{tab:tool-vs-vm} summarizes this paragraph neatly.\\
+
+            \begin{table}
+                \centering
+                \begin{tabular}{|c|c|c|}
+                    \cline{2-3}
+                    \multicolumn{1}{l}{} & \multicolumn{1}{|c|}{\textbf{Our Tool}} & \textbf{VMs}\\
+                    \hline
+                    \textbf{Network Control} & Easy and Total & Hard and Total\\
+                    \hline
+                    \textbf{Impact on the Host's Resources} & Low & High\\
+                    \hline
+                    \textbf{Ease of Deployment} & High & Low\\
+                    \hline
+                    \textbf{Preexisting Configurations for Nodes} & A lot & Not that many\\
+                    \hline
+                \end{tabular}
+                \caption[Our Tool vs. VMs]{Comparison of Both Approaches as Teaching Platforms}
+                \label{tab:tool-vs-vm}
+            \end{table}
+
+            If this option were to be pursued, the already existing code could easily be turned into a \textit{python package} \cite{bib:python-import} and be distributed through package indices such as \textit{PyPI} \cite{bib:pypi}, making the deployment of the tool trivially easy on end systems.\\
