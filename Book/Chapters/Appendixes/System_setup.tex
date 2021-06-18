@@ -115,8 +115,23 @@
 
         With the configuration we have just described user \texttt{<username>} will be capable of executing any \textit{iproute2} command without depending in \texttt{sudo}. As seen on \cite{bib:man-capabilities}, capability sets are maintained across \texttt{fork()}s. Given \texttt{system()} relies on \texttt{fork()} we can rest assured this approach will be compatible with how we are interacting with the \textit{iproute2} suite. Capabilities might come across as confusing at first sight, but they are a great mechanism to gain a firmer grasp on a system's security policies.\\
 
+    \section{Interacting With \textit{docker} as a Regular User}
+        After following the installation procedure outlined before the user might find he or she cannot execute \textit{docker} commands. This is due to the fact that only \textit{root} can do that by default. However, given permissions are based on both \textit{users} and \textit{groups} on \textit{Unix}-like systems we can easily grant any user the ability to interact with the \textit{docker engine}. By running \texttt{sudo usermod -aG docker <username>} we would be granting user \texttt{username} the ability to use \textit{docker's CLI}. The \texttt{usermod} \cite{bib:man-usermod} command will just add user \texttt{username} to the \texttt{docker} group. This group is automatically created during \textit{docker's} installation. Please note that the changes will not come into effect until the user in question logs in again after being added to the \texttt{docker} group (i.e. the user will need to spawn another \textit{shell}).\\
+
+        If we combine this setup with the one outlined in the previous section we can avoid having to run our tool as \textit{root}, thus providing stricter security measures and a more elegant design.\\
+
     \section{Acquiring the Project's Code}
+        This document has only described the functions, classes and methods we have defined to provide a tool capable of automating the deployment and management of full virtual networks. This section exposes how one can gain access to the entire source code so that he or she can run the code and use it as they please.\\
+
         \subsection{Leveraging \texttt{git}}
+            As per \cite{bib:man-git}, ``\textit{git} is a fast, scalable, distributed revision control system''. We have decided to leverage its capabilities to aide in our development even though we were working on our own. It has allowed us to manage our code in a resilient way, keep several synchronised backups and keep our source tree tidy at all times.\\
+
+            In our opinion, one of \textit{git's} best features is that it allows users to quickly obtain a copy of a project. The next section is devoted to explaining how anybody can obtain the product of our work and how they can also propose changes in such a way that handling them is an almost effortless procedure.\\
+
             \subsubsection{Cloning the Repository}
+                \textit{Git} is concerned with managing repositories. Our code exists as a \textit{remote repository} that a user may \textit{clone} to obtain a local copy of it. Thus, by issuing the \texttt{git clone https://github.com/pcolladosoto/cld\_wall.git} command a directory named \texttt{cld\_wall} will be created in the current working directory. Said directory is just a \textit{local copy} of the \textit{remote repository}. It allows the user not only access ti the current version of the code, but also to its entire history. This is by no means a comprehensive guide on how to use \textit{git}. We encourage the reader to read through \cite{bib:man-git} and also to consider reading \cite{bib:pro-git} if he or she finds the topic interesting. We have also prepared a small presentation (albeit in Spanish) that can be found in \cite{bib:git-talk} covering the basics of \textit{git}.\\
+
             \subsubsection{Proposing Changes}
-    \section{Framework Code}
+                Given the project's source code is hosted on \url{https://github.com} one can leverage the mechanisms it provides for handling a project's lifespan. We personally find \textit{issues} \footnote{https://guides.github.com/features/issues/} to be quite intuitive and we encourage any user wanting to propose an enhancement or point out a \textit{bug} to open an issue at \url{https://github.com/pcolladosoto/cld\_wall/issues}. We will try to do our best to reply to any requests we might receive.\\
+
+    % \section{Framework Code}
