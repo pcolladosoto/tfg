@@ -1,7 +1,7 @@
 \subsubsection{Subnet\_Machines.py}
     This file contains the class definitions for the elements belonging to a subnet: \texttt{bridges} and \texttt{nodes}. We would like to clarify that we refer to regular \texttt{hosts} as \texttt{nodes} interchangeably.\\
 
-    We have purposefully decided \textbf{not to consider} \texttt{routers} as part of these subnets. The logic behind the decision is that a \texttt{router} belongs to at least two subnets in out topologies. Thus, defining its class in a file whose context is that of a single subnet did not seem appropriate.\\
+    We have purposefully decided \textbf{not to consider} \texttt{routers} as part of a subnet. The logic behind the decision is that a \texttt{router} belongs to at least two subnets in our topologies. Thus, defining its class in a file whose context is that of a single subnet did not seem appropriate.\\
 
     Once again, we should point out how an instance of the \texttt{k\_bridge} class \textbf{is not} the same thing as the actual \texttt{bridge}, but they are intimately related. The following explains the lifecycle of both classes defined in this file.\\
 
