@@ -1,89 +1,10 @@
-\documentclass[12 pt, onesided]{book}
+% We prefer a oneside layout even though books
+    % default to twoside
+\documentclass[12 pt, oneside]{book}
 
-% Vertical bars
-\usepackage{amsmath}
-
-% Handle characters beyond ASCII nicely
-\usepackage[utf8]{inputenc}
-
-% Make the References section show up in the table of contents
-\usepackage[nottoc, numbib]{tocbibind}
-
-% Style the ToCs. Package documentation at:
-    % http://mirrors.ibiblio.org/CTAN/macros/latex/contrib/tocloft/tocloft.pdf
-\usepackage{tocloft}
-
-% Quotes
-\usepackage{epigraph}
-
-% Adding figures...
-\usepackage{graphicx}
-\graphicspath{{Figs/}}
-
-% Rotating floats: figures, tables...
-\usepackage{rotating}
-
-% Links please!
-\usepackage[
-    pdfauthor  = {Pablo Collado Soto (pcolladosoto@gmx.com)}, % PDF Metadata
-    pdftitle   = {Think of Something Witty...},               % PDF Metadata
-    pdfborder  = {0 0 0},                                     % Remove the ugly border
-    colorlinks = true,                                        % Let there be color
-    citecolor  = black,                                       % Make citations appear normal (i.e black)
-    linkcolor  = black,                                       % The same for links (i.e table of contents)
-    urlcolor   = cyan                                         % Color the web links. (cyan is fancy for blueish...)
-]{hyperref}
-
-% Code listings
-    % See https://www.overleaf.com/learn/latex/Code_listing
-\usepackage{listings, lstautogobble}
-\usepackage{xcolor}
-
-\definecolor{codegreen}{rgb}{0,0.6,0}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
-
-\lstdefinestyle{mystyle}{
-    % backgroundcolor = \color{backcolour},
-    commentstyle = \color{codegreen},
-    keywordstyle = \color{magenta},
-    numberstyle = \tiny\color{codegray},
-    stringstyle = \color{codepurple},
-    basicstyle = \ttfamily\footnotesize, % Consider using \scriptsize!
-    breakatwhitespace = false,
-    breaklines = true,
-    captionpos = b,
-    keepspaces = true,
-    numbers = left,
-    numbersep = 5pt,
-    showspaces = false,
-    showstringspaces = false,
-    showtabs = false,
-    tabsize = 2,
-    autogobble = true
-}
-
-\lstset{style = mystyle}
-
-% Bibliography Stuff
-    % See https://www.overleaf.com/learn/latex/Bibliography_management_in_LaTeX though!
-    % Note the 'dashed = false' option prevents a repeated author's name to be replaced
-        % by dashes (----) when both references share a page.
-\usepackage[backend = bibtex, style = ieee, dashed = flase]{biblatex}
-\addbibresource{Bibliography/articles.bib}
-\addbibresource{Bibliography/figures.bib}
-\addbibresource{Bibliography/websites.bib}
-\addbibresource{Bibliography/manpages.bib}
-\addbibresource{Bibliography/books.bib}
-
-% Gantt Diagrams
-\usepackage{pgfgantt}
-
-% Euro symbol
-\usepackage{eurosym}
-
-% Modify the margins
+% This package allows us to control the document wide
+    % margins whilst also altering them at certain
+    % pages
 \usepackage[
     a4paper,
     left  = 2.5cm,
@@ -92,18 +13,98 @@
     % bottom = 2cm
 ]{geometry}
 
-% Enable fixed-width centered columns
-% \usepackage{array}
-% \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+% Allows using vertical bars in math mode
+\usepackage{amsmath}
 
-% Insert space between paragraphs
-\newcommand{\newpar} {
-    \vskip 0.5cm
-}
+% Handles characters beyond ASCII nicely
+\usepackage[utf8]{inputenc}
 
-% Remove the title page's number
-\usepackage{titling}
+% Adds the Euro Symbol
+\usepackage{eurosym}
 
-\title{Think about something witty}
-\author{Pablo \\ \\ \textbf{\texttt{TFG}} \\ \\ \textbf{Universidad de Alcalá}}
-\date{}
+% Table of Contents Control
+    % Determines the ToC's Contents.
+        % nottoc -> Do NOT include the ToC in the ToC itself.
+        % notlof -> Do NOT include the LoF in the ToC.
+        % notlot -> Do NOT include the LoT in the ToC.
+    \usepackage[nottoc, notlof, notlot]{tocbibind}
+
+    % Style the ToCs. Package documentation at:
+        % http://mirrors.ibiblio.org/CTAN/macros/latex/contrib/tocloft/tocloft.pdf
+        \usepackage{tocloft}
+
+% Bibliography Stuff
+    % See https://www.overleaf.com/learn/latex/Bibliography_management_in_LaTeX
+    % Note the 'dashed = false' option prevents a repeated author's name to be replaced
+        % by dashes (----) when both references share a page.
+        \usepackage[backend = bibtex, style = ieee, dashed = flase]{biblatex}
+
+        % Include our Bibliography Databases (i.e. *.bib files)
+            \addbibresource{Bibliography/articles.bib}
+            \addbibresource{Bibliography/figures.bib}
+            \addbibresource{Bibliography/websites.bib}
+            \addbibresource{Bibliography/manpages.bib}
+            \addbibresource{Bibliography/books.bib}
+
+% Figure Control
+    % Handles the addition of figures
+    \usepackage{graphicx}
+    \graphicspath{{Figs/}}
+
+    % Allows rotating floats such as figures and tables.
+    \usepackage{rotating}
+
+% Gantt Diagrams
+\usepackage{pgfgantt}
+
+% Allows the inclusion of PDF pages. We
+    % use it to include pre-crafted covers.
+\usepackage{pdfpages}
+
+% Allows the easy addition of quotes
+\usepackage{epigraph}
+
+% Link Control
+    \usepackage[
+        pdfauthor  = {Pablo Collado Soto (pcolladosoto@gmx.com)}, % PDF Metadata
+        pdftitle   = {Think of Something Witty...},               % PDF Metadata
+        pdfborder  = {0 0 0},                                     % Remove the ugly border
+        colorlinks = true,                                        % Let there be color
+        citecolor  = black,                                       % Make citations appear normal (i.e black)
+        linkcolor  = black,                                       % The same for links (i.e table of contents)
+        urlcolor   = cyan                                         % Color the web links. (cyan is fancy for blueish...)
+    ]{hyperref}
+
+% Code Listings
+    % See https://www.overleaf.com/learn/latex/Code_listing
+    \usepackage{listings, lstautogobble}
+    \usepackage{xcolor}
+
+    % Color definitions to be used in the listings
+    \definecolor{codegreen}{rgb}{0,0.6,0}
+    \definecolor{codegray}{rgb}{0.5,0.5,0.5}
+    \definecolor{codepurple}{rgb}{0.58,0,0.82}
+    \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+    % Defines an style for the listings
+    \lstdefinestyle{lststyle}{
+        % backgroundcolor = \color{backcolour},
+        commentstyle = \color{codegreen},
+        keywordstyle = \color{magenta},
+        numberstyle = \tiny\color{codegray},
+        stringstyle = \color{codepurple},
+        basicstyle = \ttfamily\footnotesize, % Consider using \scriptsize!
+        breakatwhitespace = false,
+        breaklines = true,
+        captionpos = b,
+        keepspaces = true,
+        numbers = left,
+        numbersep = 5pt,
+        showspaces = false,
+        showstringspaces = false,
+        showtabs = false,
+        tabsize = 2,
+        autogobble = true
+    }
+
+    \lstset{style = lststyle}
