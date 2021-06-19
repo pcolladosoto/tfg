@@ -1,7 +1,7 @@
-\subsubsection{\texttt{Subnet\_Machines.py}}
-    This file contains the class definitions for the elements belonging to a subnetwork: \texttt{bridges} and \texttt{nodes}. We would like to clarify that we refer to regular \texttt{hosts} as \texttt{nodes} interchangeably.\\
+\subsubsection{Subnet\_Machines.py}
+    This file contains the class definitions for the elements belonging to a subnet: \texttt{bridges} and \texttt{nodes}. We would like to clarify that we refer to regular \texttt{hosts} as \texttt{nodes} interchangeably.\\
 
-    We have purposefully decided \textbf{not to consider} \texttt{routers} as part of these subnetworks. The logic behind the decision is that a \texttt{router} belongs to at least two subnetworks in out topologies. Thus, defining its class in a file whose context is that of a single subnetwork did not seem appropriate.\\
+    We have purposefully decided \textbf{not to consider} \texttt{routers} as part of these subnets. The logic behind the decision is that a \texttt{router} belongs to at least two subnets in out topologies. Thus, defining its class in a file whose context is that of a single subnet did not seem appropriate.\\
 
     Once again, we should point out how an instance of the \texttt{k\_bridge} class \textbf{is not} the same thing as the actual \texttt{bridge}, but they are intimately related. The following explains the lifecycle of both classes defined in this file.\\
 
@@ -24,7 +24,7 @@
 
     \paragraph{Global Variables}
         \begin{enumerate}
-            \item \textbf{\texttt{\allowbreak t\_colors - dictionary/string/string}:} This is a synonym for the \texttt{\allowbreak terminal\_escape\_sequences dictionary} we me mentioned before. It is used within calls to \texttt{print()} so that we can alter the terminal text's color allowing for a more visual information representation.
+            \item \textbf{\texttt{\allowbreak t\_colors - dictionary/string/string}:} This is a synonym for the \texttt{\allowbreak terminal \_escape\_sequences dictionary} we me mentioned before. It is used within calls to \texttt{print()} so that we can alter the terminal text's color allowing for a more visual information representation.
         \end{enumerate}
 
     \paragraph{The \texttt{k\_bridge} Class}
@@ -35,7 +35,7 @@
                 \item \textbf{\texttt{self.type - string}:} Object type identifier containing the \texttt{"bridge" string} for bridges. It is used within functions to check the type of object it is currently dealing with.
                 \item \textbf{\texttt{self.name - string}:} Bridge's name.
                 \item \textbf{\texttt{self.up - boolean}:} \texttt{True} if the bridge is currently up (i.e. ``switched on''). \texttt{False} otherwise.
-                \item \textbf{\texttt{self.subnet - string}:} Bridge's associated subnetwork given as the network address for said subnetwork together with the subnet mask in \texttt{CIDR} notation.
+                \item \textbf{\texttt{self.subnet - string}:} Bridge's associated subnet given as the network address for said subnet together with the subnet mask in \texttt{CIDR} notation.
             \end{enumerate}
 
         \subparagraph{The \texttt{Constructor}}
@@ -44,7 +44,7 @@
                 \begin{enumerate}
                     \item \texttt{self - k\_birdge\_inst:} The actual bridge instance.
                     \item \texttt{name - string:} The bridge's name.
-                    \item \texttt{subnet - string:} The subnetwork associated with this bridge.
+                    \item \texttt{subnet - string:} The subnet associated with this bridge.
                 \end{enumerate}
                 \item \textbf{Returns:} Nothing.
                 \item \textbf{Description:} This method will initialize the members of an \texttt{k\_bridge\_inst} and call the \texttt{\_activate\_bridge()} method.
@@ -178,8 +178,8 @@
                 \begin{enumerate}
                     \item \texttt{self - d\_node\_inst:} The actual node instance.
                 \end{enumerate}
-                \item \textbf{Returns:} A \texttt{list/string} containing the different subnetworks this node is connected to in \texttt{CIDR} format.
-                \item \textbf{Description:} This method will iterate over the \texttt{interface\_inst} contained in the \texttt{self.interfaces} attribute to then provide a list containing the subnetworks each of these \texttt{interface\_inst} belong to. Even though nodes will usually belong to a single subnetwork this method allows for a more extensible design that can accommodate for nodes belonging to different subnetworks in more complex topologies.
+                \item \textbf{Returns:} A \texttt{list/string} containing the different subnets this node is connected to in \texttt{CIDR} format.
+                \item \textbf{Description:} This method will iterate over the \texttt{interface\_inst} contained in the \texttt{self.interfaces} attribute to then provide a list containing the subnets each of these \texttt{interface\_inst} belong to. Even though nodes will usually belong to a single subnet this method allows for a more extensible design that can accommodate for nodes belonging to different subnets in more complex topologies.
             \end{enumerate}
 
         \subparagraph{The \texttt{get\_interface()} Method}
@@ -187,15 +187,15 @@
                 \item \textbf{Parameters:}
                 \begin{enumerate}
                     \item \texttt{self - d\_node\_inst:} The actual node instance.
-                    \item \texttt{subnet - string - optional:} Specifies the subnetwork for which an associated \texttt{interface\_inst} should be returned.
+                    \item \texttt{subnet - string - optional:} Specifies the subnet for which an associated \texttt{interface\_inst} should be returned.
                 \end{enumerate}
                 \item \textbf{Returns:} The following are evaluated in order.
                 \begin{enumerate}
                     \item A \texttt{list/interface\_inst} if the \texttt{subnet} parameter was not specified.
-                    \item An \texttt{interface\_inst} associated to the subnetwork specified in the \texttt{subnet} parameter.
-                    \item \texttt{None} if there is no interface associated with the subnetwork specified through the \texttt{subnet} parameter.
+                    \item An \texttt{interface\_inst} associated to the subnet specified in the \texttt{subnet} parameter.
+                    \item \texttt{None} if there is no interface associated with the subnet specified through the \texttt{subnet} parameter.
                 \end{enumerate}
-                \item \textbf{Description:} As seen on the \textbf{returns} section, the \texttt{subnet} parameter behaves like a switch. A \texttt{list} of \texttt{interface\_inst} will be returned if it is not specified by the caller. In case it is provided, it will return either an \texttt{interface\_inst} or \texttt{None} if there is no interface associated with the specified subnetwork.
+                \item \textbf{Description:} As seen on the \textbf{returns} section, the \texttt{subnet} parameter behaves like a switch. A \texttt{list} of \texttt{interface\_inst} will be returned if it is not specified by the caller. In case it is provided, it will return either an \texttt{interface\_inst} or \texttt{None} if there is no interface associated with the specified subnet.
             \end{enumerate}
 
         \subparagraph{The \texttt{create\_interface()} Method}
@@ -205,7 +205,7 @@
                     \item \texttt{self - d\_node\_inst:} The actual node instance.
                     \item \texttt{if\_name - string:} Name of the interface to create.
                     \item \texttt{if\_subnet - string:} Subnet associated with the interface to create.
-                    \item \texttt{o\_if - boolean:} Flag indicating whether the interface to create should be allowed to ``see'' other subnetworks.
+                    \item \texttt{o\_if - boolean:} Flag indicating whether the interface to create should be allowed to ``see'' other subnets.
                 \end{enumerate}
                 \item \textbf{Returns:} Nothing.
                 \item \textbf{Description:} This method will instantiate a new interface and add it to the node's \texttt{self.interfaces list}. The method's parameters will be passed directly to the \texttt{interface} class constructor.

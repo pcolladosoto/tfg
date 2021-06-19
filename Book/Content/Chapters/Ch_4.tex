@@ -26,7 +26,7 @@
             \paragraph{User Permissions}
                 Given the project will make use of \texttt{iproute2} the program needs to be run with administrative privileges (i.e. prepended by \texttt{sudo}). Even though this is the easiest approach and everything will ``just work'' it does have some security implications (mainly command injection) we will showcase in the appendix. Instead of choosing to run the entire blob of code as \texttt{root} we can also grant certain capabilities to the user who is to run the code, namely the \texttt{NET\_ADMIN} capability (the same we need to grant containers). We should also mention that the user running the program must be able to interact with the \texttt{docker engine}. This can be ensured by adding said user to the \texttt{docker group} within the system, even though \texttt{root} will also be able to interact with and manage containers. This paragraph is intended as a warning, please refer to the appendix for a deeper discussion.\\
 
-            Depending on how the users decide to provide the required \texttt{graph} they might need to import additional modules. If they have stored a live graph as a \textit{pickle} \cite{bib:python-pickle} they will then need to import the \textit{pickle} module to \texttt{un-pickle} the graph, for instance. In our examples we will define the graphs ``on-the-fly'', which requires us to import \texttt{networkx} itself. Listing \ref{lst:sample-topology-graph} shows how one would define the topology found on figure \ref{fig:sample-topology} as a \texttt{networkx} graph.\\
+            Depending on how the users decide to provide the required \texttt{graph} they might need to import additional modules. If they have stored a live graph (i.e. an instance of a graph) as a \textit{pickle} \cite{bib:python-pickle} they will then need to import the \textit{pickle} module to \texttt{un-pickle} the graph, for instance. In our examples we will define the graphs ``on-the-fly'', which requires us to import \texttt{networkx} itself. Listing \ref{lst:sample-topology-graph} shows how one would define the topology found on figure \ref{fig:sample-topology} as a \texttt{networkx} graph.\\
 
             \begin{lstlisting}[language = python, caption = Defining the Sample Topology as a \texttt{networkx} graph., label = lst:sample-topology-graph]
                 # Import the networkx module so that we can define a graph.
@@ -68,16 +68,16 @@
                         \hline
                         \texttt{node} & A regular host.\\
                         \hline
-                        \texttt{bridge} & A link-layer switch that represents an entire subnetwork.\\
+                        \texttt{bridge} & A link-layer switch that represents an entire subnet.\\
                         \hline
-                        \texttt{router} & A net-layer router joining two or more subnetworks together.\\
+                        \texttt{router} & A net-layer router joining two or more subnets together.\\
                         \hline
                     \end{tabular}
                     \caption{Node types.}
                     \label{tab:node-types}
                 \end{table}
 
-                When adding a new node one must make sure that the following constraints \textbf{are respected}. Otherwise, all sorts of undefined behavior can and will be experienced: anything from a network that cannot be started to the presence of routing loops can happen. Given the restrictions we are imposing, these will be \textit{bipartite graphs} \cite{bib:bipartite-graphs}, set $V$ would contain bridges whilst set $U$ would contain both nodes and routers. This property \textbf{has not} been leveraged in our code, but it could prove to be useful if this work is developed further.\\
+                When adding a new node one must make sure that the following constraints \textbf{are respected}. Otherwise, all sorts of undefined behavior can and will be experienced: anything from a network that cannot be started to the presence of routing loops can happen. Given the restrictions we are imposing, these will be \textit{bipartite graphs} \cite{bib:bipartite-graphs}. If we assume $U$ and $V$ as the two sets in the \textit{bipartite graph}, set $V$ would contain bridges whilst set $U$ would contain both nodes and routers. This property \textbf{has not} been leveraged in our code, but it could prove to be useful if this work is developed further.\\
 
                 \begin{enumerate}
                     \item \textbf{Rules regarding node definitions:}
@@ -87,7 +87,7 @@
                         \item The value of the \texttt{type} attribute \textbf{MUST} be one of \texttt{"node"}, \texttt{"router"} or \texttt{"bridge"}.
                         \item Each bridge \textbf{MUST} contain a \texttt{subnet} attribute.
                         \item Every value for a \texttt{subnet} attribute \textbf{MUST} be specified as a \texttt{string} with the \texttt{"A.B.C.D/E"} format, where $A,\ B,\ C,\ D \in [0,\ 255];\ E \in [0,\ 30]$.
-                        \item The subnetwork ranges associated to each bridge through the \texttt{subnet} attribute \textbf{MUST} be \textbf{unique}.
+                        \item The subnet ranges associated to each bridge through the \texttt{subnet} attribute \textbf{MUST} be \textbf{unique}.
                         \item Each router \textbf{MUST} contain a \texttt{fw\_rules} attribute.
                         \item Each \texttt{fw\_rules} attribute \textbf{MUST} be set to a \texttt{dictionary} complying to the specifications laid out in section \ref{sec:fw-rules}.
                     \end{enumerate}
@@ -97,7 +97,7 @@
                     \end{enumerate}
                     \item \textbf{Rules regarding the topology:}
                     \begin{enumerate}
-                        \item Each subnetwork is \textbf{MUST} be composed by a \textbf{single} switch and an arbitrary number of nodes and/or routers.
+                        \item Each subnet \textbf{MUST} be composed by a \textbf{single} switch and an arbitrary number of nodes and/or routers.
                     \end{enumerate}
                 \end{enumerate}
 
@@ -149,7 +149,7 @@
                     The \texttt{dictionary} contains $3$ key-value pairs. The first one defines the policy for the \texttt{FORWARDING} chain as a \texttt{string}. The second one contains a \texttt{list} of rules for \texttt{ACCEPT}ing packets. If the default policy is set to \texttt{ACCEPT} these rules will be meaningless... The third one contains a \texttt{list} of rules for \texttt{DROP}ping packets. If the default policy is to \texttt{DROP} them these rules will have no effect either.\\
 
             \subsubsection{Execution Modes}
-                Chapter \ref{chap:5} is devoted to analyzing the \textit{proof of concept} we have developed. Said \textit{proof of concept} will produce a series of files \texttt{CSV} containing data that characterizes how the experiment developed. These files can also be analyzed by our program to provide a nicely formatted output so that the end user can make the most of the results.\\
+                Chapter \ref{chap:5} is devoted to analyzing the \textit{proof of concept} we have developed. Said \textit{proof of concept} will produce a series of \textit{CSV} files containing data that characterizes how the experiment progressed. These files can also be analyzed by our program to provide a nicely formatted output so that the end user can make the most of the results.\\
 
                 Instantiating a full-fledged virtual network when the user only wants to load some \texttt{CSV} files to graph or analyze them can prove to be a rather time and energy consuming process. That is why we have developed the so called \textit{report mode} on top of the \textit{normal} or \textit{network mode}.\\
 
@@ -165,7 +165,7 @@
                 \begin{enumerate}
                     \item \textbf{\texttt{mvsubn <affected\_subnet> <destination\_subnet>}:} This command will move the \texttt{<affected\_subnet>} and attach it to the \texttt{\allowbreak<destination\_subnet>}. These identifiers should be the ones provided by the \texttt{lssubn}. If either subnet does not exist, the command will fail with an error message.
                     \item \textbf{\texttt{mvnode <affected\_node> <destination\_subnet>}:} This command will move the \texttt{<affected\_node>} to the \texttt{<destination\_subnet>}. These identifiers should be the ones provided by \texttt{lsnode} and \texttt{lssubn}, respectively. If either element does not exist, the command will print an error message.
-                    \item \textbf{\texttt{lssubn}:} This command will print a list of all the currently active subnetworks. These identifiers are the ones to be provided to the \texttt{mvsubn} and \texttt{mvnode} commands.
+                    \item \textbf{\texttt{lssubn}:} This command will print a list of all the currently active subnets. These identifiers are the ones to be provided to the \texttt{mvsubn} and \texttt{mvnode} commands.
                     \item \textbf{\texttt{lsnode}:} This command will print a list of all the currently active nodes. These identifiers are the ones to be provided to the \texttt{mvnode} command.
                     \item \textbf{\texttt{lsnet}:} This command will graphically represent the current network topology. Please note this call is blocking, so the user will not be able to issue any other command until he or she closes the image. This command will require the installation of the \texttt{matplotlib} dependency. It is also worth mentioning that the generated image can be stored as a \texttt{PNG} file for later inspection.
                     \item \textbf{\texttt{lscnx}:} This command will show a ``higher level graph'' capturing the logical connections set up through firewall rules within the routers belonging to the network. If firewalls have not been enabled, the command will just print an informative message on screen as the resulting graph would be the same as the one shown by the \texttt{lsnet} command, given no logical connections are hampered by firewall rules. Even though one can generate this graph, the user should regard it as more of a ``debugging'' feature. We are internally the data structure from which the graph is derived as means of making dynamic firewall reconfiguration easier.
@@ -178,10 +178,10 @@
                     \item \textbf{\texttt{reset-net}:} The attack we have written relies on several output files it generates to keep track of its current state. Thus, running the attack twice may result in some unexpected behaviour. This command will get rid of said files so as to effectively restore the network nodes to their original state.
                     \item \textbf{\texttt{clear | c}:} This command will clear the screen to allow for a more comfortable user experience. If running on a compliant shell, the \texttt{CTRL + L} combination will have the same effect. Note this command can be invoked either via \texttt{clear} or just \texttt{c} as seen in the syntax specification.
                     \item \textbf{\texttt{quit | exit | x}:} This command will dismantle the network and exit the program. Note \texttt{exit} and \texttt{x} are \textit{aliases} for \texttt{quit}.
-                    \item \textbf{\texttt{CTRL + C}:} This key combination will send the \texttt{SIGINT} signal to the process which will be handled, causing the program's termination. The user may need to press \texttt{ENTER} so that the program reads it, as the call to \texttt{input()} is blocking and sometimes interferes with the user's input.
+                    \item \textbf{\texttt{CTRL + C}:} This key combination will send the \texttt{SIGINT} signal to the process which will be handled, causing the program's termination.
                 \end{enumerate}
 
-    \section{In-depth Module Analysis}
+    \section{Overview of the Project's Modules}
         One of the principles driving software development is \textit{modularity}. We have then tried to make our code components as independent as possible whilst allowing them to cooperate so that they can be used for other purposes besides the ones that we originally intended.\\
 
         The development effort culminated on $3$ different modules fulfilling each a set of tasks:
@@ -193,6 +193,8 @@
         \end{enumerate}
 
         The design we have just specified allows other users to ``swap'' the modules they do not desire to use for their own or third-party ones. One can, for instance, decide not to use our \texttt{graph\_interpreter} and manually instantiate a network through calls to the \texttt{virt\_net} module alone and that would be completely feasible. We will now include the documentation for each of the modules down to the \textit{function-level}.\\
+
+        Given the extension of the module's description we have decided to include them on appendix \ref{app:module-analysis}. The following sections provide some general conventions, background and the reasoning behind some of our decisions during the development.\\
 
         \subsection{Conventions}
             \subsubsection{Data Type Specifications}
@@ -225,27 +227,22 @@
                 These methods will be defined for each of our classes and, given the \texttt{\_\_init\_\_()} and \texttt{\_\_del\_\_()} names can come across as rather cryptic we have decided to denote them as \texttt{constructor} and \texttt{destructor}, respectively, in the following sections.\\
 
         \subsection{The \texttt{virt\_net} Module}
-            \input{Code_doc/Constants.tex}
-            \input{Code_doc/Interface.tex}
-            \input{Code_doc/Subnet_machines.tex}
-            \input{Code_doc/Subnet.tex}
-            \input{Code_doc/Veth.tex}
-            \input{Code_doc/Net_machines.tex}
-            \input{Code_doc/Net.tex}
-            \input{Code_doc/Address_manager.tex}
+            This module encapsulates every kind of virtual network devices in their own class. Thus, one can theoretically instantiate a full-fledged virtual network through the sole use of this module. Given this module \textbf{does not} offer any routing logic, the end user would be responsible for providing it. In our case, it is implemented as part of the \texttt{graph\_interpreter} module. This module serves as the ``backbone'' supporting the latter two and it is mostly concerned with interacting with \textit{docker} and \textit{iproute2}. Thus, the code itself is not logically complex but it does require knowledge of the aforementioned technologies to understand. These contents have already been covered in chapter \ref{chap:2}.\\
+
+            Please refer to section \ref{sec:virt-net-module} for a comprehensive description of the module.\\
 
         \subsection{The \texttt{graph\_interpreter} Module}
-            This module is concerned with interpreting a graph and translating its structure to calls to methods defined in the previous module. In order to accomplish this, we have had to implement the ``thickest'' methods which are in charge of routing the network, dealing with the movement of nodes and subnetworks and parsing the initial graph. As we stated before, the use of this module is not mandatory: one can perform ``raw calls'' to the \texttt{virt\_net} module and manually handle the routing within the generated network. This would also imply features like moving nodes once the network is operational would be lost. Even though this module's purpose is not complex, the implementation of several features proved to be rather challenging.\\
+            This module is concerned with interpreting a graph and translating its structure to calls to methods defined in the previous module. In order to accomplish this, we have had to implement the ``thickest'' methods which are in charge of routing the network, dealing with the movement of nodes and subnets and parsing the initial graph. As we stated before, the use of this module is not mandatory: one can perform ``raw calls'' to the \texttt{virt\_net} module and manually handle the routing within the generated network. This would also imply features like moving nodes once the network is operational would be lost. Even though this module's purpose is not complex, the implementation of several features proved to be rather challenging.\\
 
             \paragraph{Leveraging \textit{NetworkX}}
                 We strongly believe it is better to stress one's work flaws than its strong aspects. In an effort to ease the development process whilst enhancing the outcome's resiliency we settled on leveraging the \textit{NetworkX} module.As we have previously hinted, \textit{NetworkX's} main purpose is handling graphs. By modeling our networks as undirected graphs we can leverage already implemented functionalities such as checking whether the graph is completely connected (i.e. there are no dangling nodes) or even routing algorithms. Given we have a complete view of the network we decided to apply \textit{Dijkstra's Algorithm} (section $24.3$ of \cite{bib:dijkstra-alg}). \textit{NetworkX} offers several methods through which we can obtain the shortest path between any two nodes. Combining this information with the complete list of network nodes allows us to completely route the network in an elegant way. We would like to point out once again how we manually implemented our solution to this issue through our own routing algorithm. Nevertheless, we discarded it in favour of \textit{Dijkstra's Algorithm} when we settled on relying on \textit{NetworkX}.\\
 
-            \input{Code_doc/Graph_interpreter.tex}
+            Please refer to section \ref{sec:graph-interpreter-module} for a comprehensive description of the module.\\
 
         \subsection{The \texttt{net\_ctrl} Module}
             This module is composed by a single file whose main goal is offering a \textit{CLI} to a user so that he/she can interact with a network that is currently operational. The function defined by this module is the ``entry point'' to the rest of the modules, as it is the one that should be called and passed the graph a user generates that represents the desired topology.\\
 
-            \input{Code_doc/Net_ctrl.tex}
+            Please refer to section \ref{sec:net-ctrl-module} for a comprehensive description of the module.\\
 
     \section{Working Topologies} \label{sec:working-tops}
         Developing a project such as this one can at times seem daunting during the initial steps. One finds him or herself writing a lot of code without being certain of whether it is correct or not. That is why we decided to test our work as soon as possible to verify everything was marching as intended. In order to do so we designed some simple topologies, each being more complex than the previous one. We tried to instantiate them and manually check that the connectivity between all the nodes was the desired one.\\
@@ -253,7 +250,7 @@
         This section includes these test topologies together with the most complex one we have been capable of working with.\\
 
         \subsection{Topology Alpha}
-            This was the first topology we tested. The most valuable piece of information we extracted from it was that we were able to communicate with nodes belonging to \textit{Subnet C} from \textit{Subnet B}. This proved that routing packets through a subnetwork was behaving as intended. This topology is included on figure \ref{fig:top-alpha}.\\
+            This was the first topology we tested. The most valuable piece of information we extracted from it was that we were able to communicate with nodes belonging to \textit{Subnet C} from \textit{Subnet B}. This proved that routing packets through a subnet was behaving as intended. This topology is included on figure \ref{fig:top-alpha}.\\
 
             \begin{figure}
                 \centering
@@ -263,7 +260,7 @@
             \end{figure}
 
         \subsection{Topology Beta}
-            This second topology added another subnetwork to the previous to push our routing procedures a little further. It is shown on figure \ref{fig:top-beta}.\\
+            This second topology added another subnet to the previous to push our routing procedures a little further. It is shown on figure \ref{fig:top-beta}.\\
 
             \begin{figure}
                 \centering
@@ -273,7 +270,7 @@
             \end{figure}
 
         \subsection{Topology Gamma}
-            This third topology added yet another subnetwork to the previous one. After successfully instantiating this topology we felt confident our design was capable of handling significantly more complex topologies. It is shown on figure \ref{fig:top-gamma}.\\
+            This third topology added yet another subnet to the previous one. After successfully instantiating this topology we felt confident our design was capable of handling significantly more complex topologies. It is shown on figure \ref{fig:top-gamma}.\\
 
             \begin{figure}
                 \centering

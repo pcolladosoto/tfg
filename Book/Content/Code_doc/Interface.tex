@@ -1,7 +1,7 @@
-\subsubsection{\texttt{Interface.py}}
+\subsubsection{Interface.py}
     This class will be in charge of providing a node's network functionality. An interface represents a connection with a computer network and thus is defined by a key parameter: the IP address. We should stress how an IP address is associated with an interface, \textbf{not} with the host itself. This subtlety will be extremely relevant when dealing with routers.\\
 
-    Another key aspect of interfaces is the role they play in network routes. Even though it is not entirely correct, in our case we can talk about the interface's routes. If we are being precise we would consider routes to be associated to a machine's network stack, not to a given interface. Nonetheless, as the graphs we are to instantiate will always define topologies in such a way that only an interface per host will belong to a given subnetwork we can indeed associate a route with an interface for a given route will only egress through a specific interface. This distinction will allow us to quickly and univocally query a node's route configuration.\\
+    Another key aspect of interfaces is the role they play in network routes. Even though it is not entirely correct, in our case we can talk about the interface's routes. If we are being precise we would consider routes to be associated to a machine's network stack, not to a given interface. Nonetheless, as the graphs we are to instantiate will always define topologies in such a way that only an interface per host will belong to a given subnet we can indeed associate a route with an interface for a given route will only egress through a specific interface. This distinction will allow us to quickly and univocally query a node's route configuration.\\
 
     Once an interface is configured it will just support a machine's connections. It is also crucial to note that even though an instance of the \texttt{interface} class is \textbf{not} the same thing as a \texttt{veth}, they are intimately related. Instantiating an \texttt{interface} will trigger the creation of a \texttt{veth} and deleting the former will also remove the latter. All in all, an interface's lifecycle can be described as:\\
 
@@ -16,12 +16,12 @@
     \paragraph{Imported Libraries}
         \begin{enumerate}
             \item \textbf{\texttt{os}:} This module enables the execution of commands through a \texttt{sh} shell through the \texttt{os.system()} method. One can check the shell being spawned is indeed \texttt{sh} by running \texttt{\allowbreak os.system("echo \$0")} or by querying \cite{bib:man-system}.
-            \item \textbf{\texttt{constants}:} Grant access to the \texttt{\allowbreak terminal\_escape\_sequences dictionary} containing \texttt{ANSI escape sequences} enabling colored output.
+            \item \textbf{\texttt{constants}:} Grant access to the \texttt{\allowbreak terminal\_escape \_sequences dictionary} containing \texttt{ANSI escape sequences} enabling colored output.
         \end{enumerate}
 
     \paragraph{Global Variables}
         \begin{enumerate}
-            \item \textbf{\texttt{\allowbreak t\_colors - dictionary/string/string}:} This is a synonym for the \texttt{\allowbreak terminal\_escape\_sequences dictionary} we me mentioned before. It is used within calls to \texttt{print()} so that we can alter the terminal text's color allowing for a more visual information representation.
+            \item \textbf{\texttt{\allowbreak t\_colors - dictionary/string/string}:} This is a synonym for the \texttt{\allowbreak terminal\_esc ape\_sequences dictionary} we me mentioned before. It is used within calls to \texttt{print()} so that we can alter the terminal text's color allowing for a more visual information representation.
         \end{enumerate}
 
     \paragraph{The \texttt{interface} Class}
@@ -30,11 +30,11 @@
         \subparagraph{Class Attributes}
             \begin{enumerate}
                 \item \textbf{\texttt{self.host\_name - string}:} Name identifying the host this interface belongs to.
-                \item \textbf{\texttt{self.ip\_range - string}:} Interface's IP and subnetwork mask in \textit{CIDR} \cite{bib:cidr-notation} format. Ex: \texttt{"10.0.0.1/24"}.
+                \item \textbf{\texttt{self.ip\_range - string}:} Interface's IP and subnet mask in \textit{CIDR} \cite{bib:cidr-notation} format. Ex: \texttt{"10.0.0.1/24"}.
                 \item \textbf{\texttt{self.ip - string}:} Interface's IP address.
                 \item \textbf{\texttt{self.if\_name - string}:} Interface's name. This is equivalent to traditional names like \texttt{enp2s0} or \texttt{wlp3s0} in Linux-based systems. In our case the names will follow a pattern given by \texttt{veth\_+\_-} where \texttt{+} and \texttt{-} are the names of the connected nodes. Note either \texttt{+} or \texttt{-} will be the same as \texttt{self.host\_name}. We would finally like to point out that \texttt{+} and \texttt{-} can be either upper or lowercase, depending on which is the first node to be attached to the links we create.
                 \item \textbf{\texttt{self.subn\_gateway - string}:} IP address of this subnet's gateway, following the same format as \texttt{self.ip}.
-                \item \textbf{\texttt{self.subn - string}:} Interface's subnetwork given as the network address for said subnetwork together with the subnet mask in \texttt{CIDR} notation. Ex: \texttt{10.0.0.0/24}.
+                \item \textbf{\texttt{self.subn - string}:} Interface's subnet given as the network address for said subnet together with the subnet mask in \texttt{CIDR} notation. Ex: \texttt{10.0.0.0/24}.
                 \item \textbf{\texttt{self.outbound\_interface - boolean}:} \texttt{True} if the interface's host is allowed to connect to external subnets. \texttt{False} otherwise. Due to how some ICS networks need to isolate some equipment, such as reactor's control systems, we need to know whether a given host is allowed to ``see'' the outside world. Having this information encoded into interfaces allows for a cleaner design when routing the network.
             \end{enumerate}
 
@@ -45,9 +45,9 @@
                     \item \texttt{self - interface\_inst:} The actual interface instance.
                     \item \texttt{h\_name - string:} The host the interface belongs to.
                     \item \texttt{if\_name - string:} The interface name
-                    \item \texttt{subnet - string:} The subnetwork the interface belongs to.
+                    \item \texttt{subnet - string:} The subnet the interface belongs to.
                     \item \texttt{h\_type - boolean:} \texttt{True} if the interface belongs to a regular node, \texttt{False} otherwise.
-                    \item \texttt{out\_interface - boolean - optional:} \texttt{True} if the node is allowed to ``see'' other subnetworks, \texttt{False} otherwise.
+                    \item \texttt{out\_interface - boolean - optional:} \texttt{True} if the node is allowed to ``see'' other subnets, \texttt{False} otherwise.
                 \end{enumerate}
                 \item \textbf{Returns:} Nothing.
                 \item \textbf{Description:} This method will initialize the members of an \texttt{interface\_inst} and call the \texttt{\_activate\_iface()} method.
@@ -69,7 +69,7 @@
                 \begin{enumerate}
                     \item \texttt{self - interface\_inst:} The actual interface instance.
                 \end{enumerate}
-                \item \textbf{Returns:} A \texttt{string} containing the subnetwork the interface belongs to in \texttt{CIDR} notation.
+                \item \textbf{Returns:} A \texttt{string} containing the subnet the interface belongs to in \texttt{CIDR} notation.
                 \item \textbf{Description:} Not applicable.
             \end{enumerate}
 
@@ -79,7 +79,7 @@
                 \begin{enumerate}
                     \item \texttt{self - interface\_inst:} The actual interface instance.
                 \end{enumerate}
-                \item \textbf{Returns:} A \texttt{string} containing the interface's IP and subnetwork mask in \texttt{CIDR} format.
+                \item \textbf{Returns:} A \texttt{string} containing the interface's IP and subnet mask in \texttt{CIDR} format.
                 \item \textbf{Description:} Not applicable.
             \end{enumerate}
 
@@ -129,8 +129,8 @@
                 \item \textbf{Parameters:}
                 \begin{enumerate}
                     \item \texttt{self - interface\_inst:} The actual interface instance.
-                    \item \texttt{ip\_range - string:} The interface's IP address together with its subnetwork mask.
-                    \item \texttt{gw\_addr - string - optional:} IP address of the subnetwork's gateway (i.e. router).
+                    \item \texttt{ip\_range - string:} The interface's IP address together with its subnet mask.
+                    \item \texttt{gw\_addr - string - optional:} IP address of the subnet's gateway (i.e. router).
                     \item \texttt{subnet - string - optional:} The subnet the interface belongs to in \texttt{CIDR} format.
                 \end{enumerate}
                 \item \textbf{Returns:} Nothing.
@@ -142,11 +142,11 @@
                 \item \textbf{Parameters:}
                 \begin{enumerate}
                     \item \texttt{self - interface\_inst:} The actual interface instance.
-                    \item \texttt{dest\_subnet - string:} Destination subnetwork for the route in \texttt{CIDR} format.
-                    \item \texttt{gw\_router - string:} IP of the gateway for the interface's subnetwork.
+                    \item \texttt{dest\_subnet - string:} Destination subnet for the route in \texttt{CIDR} format.
+                    \item \texttt{gw\_router - string:} IP of the gateway for the interface's subnet.
                 \end{enumerate}
                 \item \textbf{Returns:} Nothing.
-                \item \textbf{Description:} After checking the interface has been assigned an IP address and that it is allowed to communicate with other subnetworks through the \texttt{self.outbound\_interface} attribute it will add the route defined by the parameters to the \texttt{self.routes dictionary}.
+                \item \textbf{Description:} After checking the interface has been assigned an IP address and that it is allowed to communicate with other subnets through the \texttt{self.outbound\_inter face} attribute it will add the route defined by the parameters to the \texttt{self.routes dictionary}.
             \end{enumerate}
 
         \subparagraph{The \texttt{reset\_interface()} Method}
