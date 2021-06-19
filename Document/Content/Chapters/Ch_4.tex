@@ -216,7 +216,7 @@
             \subsubsection{Calling Methods Through the Module Name}
                 We have chosen to always call functions and instantiate classes external to the current file through their full name (i.e. including the name of the external file in the call). This does increase the length of code lines but it allows the reader (and ourselves) to know where the functions and classes are effectively defined. We feel like the increase in line length is completely justified.\\
 
-            \subsubsection{The __init__.py File}
+            \subsubsection{The \_\_init\_\_.py File}
                 Each of our modules contains an empty \texttt{\_\_init\_\_.py} file so that they become \textit{regular packages}. This allows us to comfortably import the modules where their contents are needed. More information on \textit{python's} import system can be found on section $5.2.1$ of \cite{bib:python-import}.
 
             \subsubsection{Constructors and Destructors}
@@ -226,12 +226,12 @@
 
                 These methods will be defined for each of our classes and, given the \texttt{\_\_init\_\_()} and \texttt{\_\_del\_\_()} names can come across as rather cryptic we have decided to denote them as \textit{constructor} and \textit{destructor}, respectively, in the following sections.\\
 
-        \subsection{The virt_net Module}
+        \subsection{The virt\_net Module}
             This module encapsulates every kind of virtual network devices in their own class. Thus, one can theoretically instantiate a full-fledged virtual network through the sole use of this module. Given this module \textbf{does not} offer any routing logic, the end user would be responsible for providing it. In our case, it is implemented as part of the \textit{graph\_interpreter} module. This module serves as the ``backbone'' supporting the latter two and it is mostly concerned with interacting with \textit{docker} and \textit{iproute2}. Thus, the code itself is not logically complex but it does require knowledge of the aforementioned technologies to understand. These contents have already been covered in chapter \ref{chap:2}.\\
 
             Please refer to section \ref{sec:virt-net-module} for a comprehensive description of the module.\\
 
-        \subsection{The graph_interpreter Module}
+        \subsection{The graph\_interpreter Module}
             This module is concerned with interpreting a graph and translating its structure to calls to methods defined in the previous module. In order to accomplish this, we have had to implement the ``thickest'' methods which are in charge of routing the network, dealing with the movement of nodes and subnets and parsing the initial graph. As we stated before, the use of this module is not mandatory: one can perform ``raw calls'' to the \textit{virt\_net} module and manually handle the routing within the generated network. This would also imply features like moving nodes once the network is operational would be lost. Even though this module's purpose is not complex, the implementation of several features proved to be rather challenging.\\
 
             \paragraph{Leveraging NetworkX}
@@ -239,7 +239,7 @@
 
             Please refer to section \ref{sec:graph-interpreter-module} for a comprehensive description of the module.\\
 
-        \subsection{The net_ctrl Module}
+        \subsection{The net\_ctrl Module}
             This module is composed by a single file whose main goal is offering a \textit{CLI} to a user so that he/she can interact with a network that is currently operational. The function defined by this module is the ``entry point'' to the rest of the modules, as it is the one that should be called and passed the graph a user generates that represents the desired topology.\\
 
             Please refer to section \ref{sec:net-ctrl-module} for a comprehensive description of the module.\\
