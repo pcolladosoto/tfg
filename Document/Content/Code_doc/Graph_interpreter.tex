@@ -17,7 +17,7 @@
     \paragraph{The graph\_interpreter Class}
         \subparagraph{Class Attributes}
             \begin{enumerate}
-                \item \textbf{\texttt{self.node\_to\_instance - dictionary/string/dictionary/string/X\_inst}:} This \texttt{dictionary} contains a \texttt{dictionary} for each and every type of network-aware machine. Each sub-\texttt{dictionary} contains all the instances of said type. Thus, one can access \textbf{every} instance through this \texttt{dictionary}. We decided to design the class in this way instead of accessing instances through the \texttt{d\_net} instance to shorten several of the class' functions. Given this attribute was being referenced many times throughout the class we believe this decision improved the code's readability.
+                \item \textbf{\texttt{self.node\_to\_instance - dictionary/string/dictionary/string/X\_inst}:} T- his \texttt{dictionary} contains a \texttt{dictionary} for each and every type of network-aware machine. Each sub-\texttt{dictionary} contains all the instances of said type. Thus, one can access \textbf{every} instance through this \texttt{dictionary}. We decided to design the class in this way instead of accessing instances through the \texttt{d\_net} instance to shorten several of the class' functions. Given this attribute was being referenced many times throughout the class we believe this decision improved the code's readability.
                 \item \textbf{\texttt{self.net\_instance - d\_net\_inst}:} This attribute contains the network instance we are working with. This is the entry point for all the methods offered by the \textit{virt\_net} module, so we will make use of this attribute over and over again.
                 \item \textbf{\texttt{self.connectivity\_view - networkx\_graph\_inst}:}  This graph captures the logical connections that can be established according to the rules defined in our firewalls. In the absence of firewalls this graph would be \textbf{equivalent} to the one we are interpreting to bring the network up. The existence of this graph made reconfiguring firewalls dynamically much easier: this logical topology \textbf{will not} change even if the physical one does, so it serves as a reference that must always be respected.
                 \item \textbf{\texttt{self.addr\_manager - addr\_manager\_inst}:} A reference to \textbf{the same} \texttt{addr\_manager \_inst} that is an attribute of the \texttt{d\_net} class. We are just referencing it though a class attribute to shorten several code lines so as to increase the code's readability.
@@ -130,14 +130,23 @@
             \item \textbf{Description:} This method will parse the \texttt{found\_routes} parameter and instantiate the appropriate routes at every node and router. The anatomy of the \texttt{found\_routes} parameter is described on listing \ref{lst:route-dict}.
         \end{enumerate}
 
-    \begin{lstlisting}[language = python, caption = Data Structure Containing All the Network's Routes., label = last:route-dict]
+    \begin{lstlisting}[language = python, caption = Data Structure Containing All the Network's Routes., label = lst:route-dict]
         {
             'dest_subnet': {
-                'source_node_a': ['source_node_a', 'gateway_x', 'dest_subnet_bridge'],
-                'source_node_b': ['source_node_b', 'gateway_y', 'dest_subnet_bridge'],
-                # There is one such entry for each node in the graph (routers, bridges and hosts).
-                    # Each of these entries has possibly more hops, but we are only interested in the
-                    # first one as that is the gateway we need to configure.
+                'source_node_a': [
+                    'source_node_a',
+                    'gateway_x',
+                    'dest_subnet_bridge'
+                ],
+                'source_node_b': [
+                    'source_node_b',
+                    'gateway_y',
+                    'dest_subnet_bridge'
+                ],
+                # There is one such entry for each node in the graph (routers,
+                    # bridges and hosts). Each of these entries has possibly
+                    # more hops, but we are only interested in the first one
+                    # as that is the gateway we need to configure.
             }
             # There is one such entry for each subnet.
         }
@@ -176,7 +185,7 @@
                 \item \texttt{graph - networkx\_graph\_inst:} The graph representing the virtual topology that is currently instantiated.
                 \item \texttt{node - string:} The name of the node to displace.
                 \item \texttt{dest\_subnet - string:} The subnet the node we are moving should be attached to, specified in \textit{CIDR} format.
-                \item \texttt{pure\_movement - boolean - optional:} This flag controls whether the changes triggered by the movement should be made effective in the internal network representation of the \textit{virt\_net} module. This parameter has been previously used for debugging this method and will often be \texttt{True}.
+                \item \texttt{pure\_movement - boolean - optional:} This flag controls whether the chan- ges triggered by the movement should be made effective in the internal network representation of the \textit{virt\_net} module. This parameter has been previously used for debugging this method and will often be \texttt{True}.
             \end{enumerate}
             \item \textbf{Returns:} Nothing.
             \item \textbf{Description:} This method will move the specified node to the provided subnet whilst handling all the intricacies that might arise when doing so. A prime example of these would be reconfiguring firewalls ``on the fly'' if the affected node had any restrictions in terms of the connections it was allowed to establish. Like the method before, this one is rather large.
