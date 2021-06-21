@@ -1,6 +1,7 @@
-# Get rid of PDFs except for the UAH's logo
+# Get rid of PDFs except for the UAH's logo and the covers
 *.pdf
 !UAH_logo.pdf
+!Covers.pdf
 
 # Get rid of MacOS's trash files
 .DS_Store
