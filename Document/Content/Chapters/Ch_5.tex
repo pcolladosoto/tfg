@@ -84,7 +84,7 @@
                 \label{fig:atk-progression}
             \end{sidewaysfigure}
 
-            \lstinputlisting[style = csvs, language = bash, caption = Retrieved Data Points for the Attack on a Static Network., label = lst:static-atk]{Experiment_data/atk-static-net.csv}
+            \lstinputlisting[style = csvs, caption = Retrieved Data Points for the Attack on a Static Network., label = lst:static-atk]{Experiment_data/atk-static-net.csv}
 
         \subsection{Trying to Mitigate the Attack}
             Given the contents of figure \ref{fig:atk-progression} we are certain that the last hosts that are to be attacked are $C_2 \to C_4$. We can then try to move several other hosts to the \textit{Corp subnet} (figure \ref{fig:top-ics}) so that they suffer the attack's consequences at a later time than they normally would. Given the ``virus'' will still be subject to a delay after sweeping each subnet, this strategy should provide a bit of leeway for the hosts we are to move.\\
@@ -118,6 +118,6 @@
                 \label{fig:atk-comparison}
             \end{sidewaysfigure}
 
-            \lstinputlisting[style = csvs, language = bash, caption = Retrieved Data Points for the Attack on a Dynamic Network., label = lst:dynamic-atk]{Experiment_data/mitigated-atk.csv}
+            \lstinputlisting[style = csvs, caption = Retrieved Data Points for the Attack on a Dynamic Network., label = lst:dynamic-atk]{Experiment_data/mitigated-atk.csv}
 
         The figures we have presented in this section display the evolution of an extremely quick attack. What is more, we have only explored a single quick response to an attack which we have found to be clearly more effective than not taking any action at all. Nonetheless, the real value of this tool is serving as a testing ground for more complex and efficient techniques that are being developed as part of associated research projects. We have decided to prepare this short demonstration in an effort to showcase our tool's potential and we have not even scratched the surface.\\

@@ -81,18 +81,19 @@
     \usepackage{xcolor}
 
     % Color definitions to be used in the listings
-    \definecolor{codegreen}{rgb}{0,0.6,0}
-    \definecolor{codegray}{rgb}{0.5,0.5,0.5}
-    \definecolor{codepurple}{rgb}{0.58,0,0.82}
-    \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+        % Check http://latexcolor.com to get some
+        % really nice colour definitions!
+    \definecolor{atomictangerine}{rgb}{1.0, 0.6, 0.4}
+    \definecolor{dollarbill}{rgb}{0.52, 0.73, 0.4}
+    \definecolor{dimgray}{rgb}{0.41, 0.41, 0.41}
+    \definecolor{ceruleanblue}{rgb}{0.16, 0.32, 0.75}
 
-    % Defines an style for the listings
-    \lstdefinestyle{lststyle}{
-        % backgroundcolor = \color{backcolour},
-        commentstyle = \color{codegreen},
-        keywordstyle = \color{magenta},
-        numberstyle = \tiny\color{codegray},
-        stringstyle = \color{codepurple},
+    % Defines a default style for the listings
+    \lstdefinestyle{default}{
+        commentstyle = \color{dimgray},
+        keywordstyle = \color{atomictangerine},
+        numberstyle = \tiny\color{ceruleanblue},
+        stringstyle = \color{dollarbill},
         basicstyle = \ttfamily\footnotesize, % Consider using \scriptsize!
         breakatwhitespace = false,
         breaklines = true,
@@ -109,11 +110,7 @@
 
     % This style defines a left margin to visually center CSV files
     \lstdefinestyle{csvs}{
-        % backgroundcolor = \color{backcolour},
-        commentstyle = \color{codegreen},
-        keywordstyle = \color{magenta},
-        numberstyle = \tiny\color{codegray},
-        stringstyle = \color{codepurple},
+        numberstyle = \tiny\color{ceruleanblue},
         basicstyle = \ttfamily\footnotesize, % Consider using \scriptsize!
         breakatwhitespace = false,
         breaklines = true,
@@ -130,4 +127,4 @@
         % xrightmargin=1cm
     }
 
-    \lstset{style = lststyle}
+    \lstset{style = default}
